@@ -1,5 +1,6 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, Db, Collection } from 'mongodb'
 import { config } from 'dotenv'
+import User from '~/models/schemas/Users.schema'
 config({ quiet: true }) // tuỳ version dotenv
 
 // Connection URL
@@ -9,8 +10,10 @@ const dbName = process.env.DB_NAME || 'test'
 class DatabaseService {
   // You can add database related methods here
   private client: MongoClient
+  private db: Db
   constructor() {
     this.client = new MongoClient(url)
+    this.db = this.client.db(dbName)
   }
   async connect() {
     try {
@@ -21,9 +24,11 @@ class DatabaseService {
     } catch (error) {
       console.error('Error connecting to database:', error)
       throw error
-    } finally {
-      await this.client.close()
     }
+  }
+
+  get users(): Collection<User> {
+    return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
 }
 export default new DatabaseService()
