@@ -6,6 +6,7 @@ import bannersRouter from './routes/banners.routes'
 import cartRouter from './routes/cart.routes'
 import locationsRouter from './routes/locations.routes'
 import checkoutRouter from './routes/checkout.routes'
+import ordersRouter from './routes/orders.routes'
 import databaseServices from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middleware'
 import { config } from 'dotenv'
@@ -24,6 +25,7 @@ app.use('/api/v1/banners', bannersRouter)
 app.use('/api/v1/cart', cartRouter)
 app.use('/api/v1/locations', locationsRouter)
 app.use('/api/v1/checkout', checkoutRouter)
+app.use('/api/v1/orders', ordersRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, World!')
