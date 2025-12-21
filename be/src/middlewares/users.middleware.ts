@@ -5,77 +5,107 @@ import { USERS_MESSAGES } from '~/constants/messages'
 import databaseServices from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
 import { config } from 'dotenv'
+import { verifyToken } from '~/utils/jwt'
+import { ErrorWithStatus } from '~/models/Errors'
+import HTTP_STATUS from '~/constants/httpStatus'
 config()
 export const loginValidator = validate(
-  checkSchema({
-    email: {
-      in: ['body'],
-      isEmail: { errorMessage: USERS_MESSAGES.INVALID_EMAIL_FORMAT },
-      normalizeEmail: true,
-      notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_AND_PASSWORD_REQUIRED },
-      custom: {
-        options: async (value, { req }) => {
-          const user = await databaseServices.users.findOne({ email: value, password: hashPassword(req.body.password) })
-          if (user === null) {
-            throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_INCORRECT)
+  checkSchema(
+    {
+      email: {
+        in: ['body'],
+        isEmail: { errorMessage: USERS_MESSAGES.INVALID_EMAIL_FORMAT },
+        normalizeEmail: true,
+        notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_AND_PASSWORD_REQUIRED },
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseServices.users.findOne({
+              email: value,
+              password: hashPassword(req.body.password)
+            })
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_INCORRECT)
+            }
+            req.user = user
+            return true
           }
-          req.user = user
-          return true
+        }
+      },
+      password: {
+        notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_AND_PASSWORD_REQUIRED },
+        isString: { errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING },
+        isLength: {
+          options: { min: 6 },
+          errorMessage: USERS_MESSAGES.PASSWORD_MIN_LENGTH
         }
       }
     },
-    password: {
-      notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_AND_PASSWORD_REQUIRED },
-      isString: { errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING },
-      isLength: {
-        options: { min: 6 },
-        errorMessage: USERS_MESSAGES.PASSWORD_MIN_LENGTH
-      }
-    }
-  })
+    ['body']
+  )
 )
 export const registerValidator = validate(
-  checkSchema({
-    username: {
-      in: ['body'],
-      trim: true,
-      isString: { errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING },
-      notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_IS_REQUIRED }
-    },
-    email: {
-      in: ['body'],
-      isEmail: { errorMessage: USERS_MESSAGES.INVALID_EMAIL_FORMAT },
-      normalizeEmail: true,
-      custom: {
-        options: async (value) => {
-          const checkEmailExists = await usersServices.checkEmailExists(value)
-          if (checkEmailExists) {
-            throw new Error(USERS_MESSAGES.EMAIL_ALREADY_IN_USE)
+  checkSchema(
+    {
+      username: {
+        in: ['body'],
+        trim: true,
+        isString: { errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING },
+        notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_IS_REQUIRED }
+      },
+      email: {
+        in: ['body'],
+        isEmail: { errorMessage: USERS_MESSAGES.INVALID_EMAIL_FORMAT },
+        normalizeEmail: true,
+        custom: {
+          options: async (value) => {
+            const checkEmailExists = await usersServices.checkEmailExists(value)
+            if (checkEmailExists) {
+              throw new Error(USERS_MESSAGES.EMAIL_ALREADY_IN_USE)
+            }
+            return true
           }
-          return true
+        }
+      },
+      password: {
+        in: ['body'],
+        isLength: {
+          options: { min: 6 },
+          errorMessage: USERS_MESSAGES.PASSWORD_MIN_LENGTH
+        }
+      },
+      confirm_password: {
+        in: ['body'],
+        custom: {
+          options: (value, { req }) => value === req.body.password,
+          errorMessage: USERS_MESSAGES.PASSWORDS_NOT_MATCH
+        }
+      },
+      date_of_birth: {
+        in: ['body'],
+        optional: true,
+        isISO8601: {
+          options: { strict: true },
+          errorMessage: USERS_MESSAGES.INVALID_DATE_OF_BIRTH
         }
       }
     },
-    password: {
-      in: ['body'],
-      isLength: {
-        options: { min: 6 },
-        errorMessage: USERS_MESSAGES.PASSWORD_MIN_LENGTH
-      }
-    },
-    confirm_password: {
-      in: ['body'],
+    ['body']
+  )
+)
+
+export const accessTokenValidator = validate(
+  checkSchema({
+    Authorization: {
       custom: {
-        options: (value, { req }) => value === req.body.password,
-        errorMessage: USERS_MESSAGES.PASSWORDS_NOT_MATCH
-      }
-    },
-    date_of_birth: {
-      in: ['body'],
-      optional: true,
-      isISO8601: {
-        options: { strict: true },
-        errorMessage: USERS_MESSAGES.INVALID_DATE_OF_BIRTH
+        options: async (value, { req }) => {
+          const access_token = value.split(' ')[1]
+          if (access_token == '') {
+            throw new ErrorWithStatus(USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED, HTTP_STATUS.UNAUTHORIZED)
+          }
+          const decodedVerifyToken = await verifyToken({ token: access_token })
+          req.decoded_authorization = decodedVerifyToken
+          return true
+        }
       }
     }
   })

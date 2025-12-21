@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { loginValidator, registerValidator } from '~/middlewares/users.middleware'
-import { loginController, registerController } from '~/controllers/users.controller'
+import { loginValidator, registerValidator, accessTokenValidator } from '~/middlewares/users.middleware'
+import { loginController, registerController, logoutController } from '~/controllers/users.controller'
 import { wrapRequestHandler } from '~/utils/handler'
 
 const usersRouter = Router()
@@ -24,4 +24,13 @@ Path: /register
 Method: POST
 Request Body: { username: string, email: string, password: string, confirm_password: string, date_of_birth: ISO8601 }
 */
+
+usersRouter.post('/logout', accessTokenValidator, wrapRequestHandler(logoutController))
+/**
+Description: The logout route for user logout.
+Path: /logout
+Method: POST
+Request Body: { refresh_token: string }
+**/
+
 export default usersRouter
