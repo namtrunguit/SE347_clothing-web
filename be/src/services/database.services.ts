@@ -5,6 +5,7 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Category from '~/models/schemas/Category.schema'
 import Product from '~/models/schemas/Product.schema'
 import Cart from '~/models/schemas/Cart.schema'
+import Order from '~/models/schemas/Order.schema'
 config({ quiet: true }) // tuỳ version dotenv
 
 // Connection URL
@@ -48,6 +49,10 @@ class DatabaseService {
 
   get carts(): Collection<Cart> {
     return this.db.collection(process.env.DB_CARTS_COLLECTION as string)
+  }
+
+  get orders(): Collection<Order> {
+    return this.db.collection(process.env.DB_ORDERS_COLLECTION as string)
   }
 }
 export default new DatabaseService()
