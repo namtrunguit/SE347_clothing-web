@@ -2,6 +2,7 @@ import express from 'express'
 import usersRouter from './routes/users.routes'
 import categoriesRouter from './routes/categories.routes'
 import productsRouter from './routes/products.routes'
+import bannersRouter from './routes/banners.routes'
 import databaseServices from './services/database.services'
 import { defaultErrorHandler } from './middlewares/errors.middleware'
 import { config } from 'dotenv'
@@ -16,6 +17,7 @@ config()
 app.use('/api/v1/auth', usersRouter)
 app.use('/api/v1/categories', categoriesRouter)
 app.use('/api/v1/products', productsRouter)
+app.use('/api/v1/banners', bannersRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, World!')
