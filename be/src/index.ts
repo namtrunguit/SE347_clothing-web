@@ -8,10 +8,10 @@ const PORT = 5000
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-databaseServices.connect()
+databaseServices.connect().catch(console.dir)
 config()
 //  Use user routes
-app.use('/users', usersRouter)
+app.use('/api/v1/auth', usersRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello, World!')
