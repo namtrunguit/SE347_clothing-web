@@ -1,10 +1,29 @@
 import { Request, Response } from 'express'
 import ordersServices from '~/services/orders.services'
 
+export const getOrdersController = async (req: Request, res: Response) => {
+  const { userId } = req.decoded_authorization as any
+  const { page, limit, keyword, status, start_date, end_date } = req.query
+
+  const result = await ordersServices.getOrders(userId, {
+    page: Number(page) || 1,
+    limit: Number(limit) || 10,
+    keyword,
+    status,
+    start_date,
+    end_date
+  })
+
+  return res.json({
+    message: 'Get orders successfully',
+    data: result
+  })
+}
+
 export const getOrderController = async (req: Request, res: Response) => {
   const { userId } = req.decoded_authorization as any
   const { order_id } = req.params
-  const order = await ordersServices.getOrder(userId, order_id)
+  const order = await ordersServices.getOrderDetail(userId, order_id)
 
   if (!order) {
     return res.status(404).json({ message: 'Order not found' })
@@ -12,6 +31,6 @@ export const getOrderController = async (req: Request, res: Response) => {
 
   return res.json({
     message: 'Get order details successfully',
-    result: order
+    data: order
   })
 }
