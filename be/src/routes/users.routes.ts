@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { loginValidator, registerValidator, accessTokenValidator } from '~/middlewares/users.middleware'
+import {
+  loginValidator,
+  registerValidator,
+  accessTokenValidator,
+  refreshTokenValidator
+} from '~/middlewares/users.middleware'
 import { loginController, registerController, logoutController } from '~/controllers/users.controller'
 import { wrapRequestHandler } from '~/utils/handler'
 
@@ -25,7 +30,7 @@ Method: POST
 Request Body: { username: string, email: string, password: string, confirm_password: string, date_of_birth: ISO8601 }
 */
 
-usersRouter.post('/logout', accessTokenValidator, wrapRequestHandler(logoutController))
+usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
 /**
 Description: The logout route for user logout.
 Path: /logout

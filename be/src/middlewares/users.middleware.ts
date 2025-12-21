@@ -102,11 +102,48 @@ export const accessTokenValidator = validate(
           if (access_token == '') {
             throw new ErrorWithStatus(USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED, HTTP_STATUS.UNAUTHORIZED)
           }
-          const decodedVerifyToken = await verifyToken({ token: access_token })
+          const decodedVerifyToken = await verifyToken({
+            token: access_token,
+            secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN
+          })
           req.decoded_authorization = decodedVerifyToken
           return true
         }
       }
     }
   })
+)
+
+export const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refresh_token: {
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus(USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED, HTTP_STATUS.UNAUTHORIZED)
+            }
+            try {
+              const [decoded_refresh_token, refresh_token] = await Promise.all([
+                verifyToken({ token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string }),
+                databaseServices.refreshTokens.findOne({ token: value })
+              ])
+              if (refresh_token === null) {
+                throw new ErrorWithStatus(USERS_MESSAGES.USED_REFRESH_TOKEN_OR_NOT_EXIST, HTTP_STATUS.UNAUTHORIZED)
+              }
+              req.decoded_refresh_token = decoded_refresh_token
+            } catch (error) {
+              if (error instanceof ErrorWithStatus) {
+                throw error
+              }
+              throw new ErrorWithStatus(USERS_MESSAGES.USED_REFRESH_TOKEN_OR_NOT_EXIST, HTTP_STATUS.UNAUTHORIZED)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
 )
