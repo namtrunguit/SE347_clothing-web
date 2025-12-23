@@ -9,7 +9,9 @@ import {
   adminGetProductsMetadataController,
   adminGetProductDetailController,
   adminUpdateProductController,
-  adminDeleteProductController
+  adminDeleteProductController,
+  adminOrdersStatsController,
+  adminGetOrdersController
 } from '~/controllers/admin.controller'
 import { wrapRequestHandler } from '~/utils/handler'
 
@@ -100,3 +102,18 @@ export default adminRouter
  * Query: { start_date?, end_date? }
  */
 adminRouter.get('/stats/overview', accessTokenValidator, requireAdmin, wrapRequestHandler(statsOverviewController))
+
+/**
+ * Description: Admin - Order stats
+ * Path: /orders/stats
+ * Method: GET
+ */
+adminRouter.get('/orders/stats', accessTokenValidator, requireAdmin, wrapRequestHandler(adminOrdersStatsController))
+
+/**
+ * Description: Admin - List orders
+ * Path: /orders
+ * Method: GET
+ * Query: { page?, limit?, keyword?, status?, date_from?, date_to?, sort_by?, order? }
+ */
+adminRouter.get('/orders', accessTokenValidator, requireAdmin, wrapRequestHandler(adminGetOrdersController))

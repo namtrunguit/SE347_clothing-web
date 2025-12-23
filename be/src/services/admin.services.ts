@@ -127,6 +127,146 @@ class AdminService {
       }
     }
   }
+  async getAdminOrderStats() {
+    const [total_orders, pending_count, shipping_count, cancelled_count] = await Promise.all([
+      databaseServices.orders.countDocuments({}),
+      databaseServices.orders.countDocuments({ status: OrderStatus.Pending }),
+      databaseServices.orders.countDocuments({ status: OrderStatus.Shipping }),
+      databaseServices.orders.countDocuments({ status: OrderStatus.Cancelled })
+    ])
+    return { total_orders, pending_count, shipping_count, cancelled_count }
+  }
+
+  async getAdminOrders(params: {
+    page?: number
+    limit?: number
+    keyword?: string
+    status?: 'pending' | 'shipping' | 'completed' | 'cancelled' | 'processing'
+    date_from?: string
+    date_to?: string
+    sort_by?: string
+    order?: 'asc' | 'desc'
+  }) {
+    const page = params.page && params.page > 0 ? params.page : 1
+    const limit = params.limit && params.limit > 0 ? params.limit : 10
+
+    const match: any = {}
+    if (params.status) match.status = params.status
+
+    if (params.date_from || params.date_to) {
+      match.created_at = {}
+      if (params.date_from) {
+        const d = new Date(params.date_from)
+        d.setHours(0, 0, 0, 0)
+        match.created_at.$gte = d
+      }
+      if (params.date_to) {
+        const d = new Date(params.date_to)
+        d.setHours(23, 59, 59, 999)
+        match.created_at.$lte = d
+      }
+    }
+
+    const sort: any = {}
+    const sortBy = params.sort_by || 'created_at'
+    sort[sortBy] = params.order === 'asc' ? 1 : -1
+
+    // Build pipeline with optional keyword search on order_code OR user name/email
+    const pipeline: any[] = [{ $match: match }]
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: process.env.DB_USERS_COLLECTION as string,
+          localField: 'user_id',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } }
+    )
+
+    if (params.keyword) {
+      const regex = new RegExp(params.keyword, 'i')
+      pipeline.push({
+        $match: {
+          $or: [{ order_code: regex }, { 'user.full_name': regex }, { 'user.email': regex }]
+        }
+      })
+    }
+
+    const countPipeline = [...pipeline, { $count: 'total' }]
+    pipeline.push({ $sort: sort }, { $skip: (page - 1) * limit }, { $limit: limit })
+
+    const [rows, totalAgg] = await Promise.all([
+      databaseServices.orders.aggregate(pipeline).toArray(),
+      databaseServices.orders.aggregate(countPipeline).toArray()
+    ])
+
+    const total = totalAgg[0]?.total || 0
+
+    const fmtMoney = (n: number) => `${new Intl.NumberFormat('vi-VN').format(n)}đ`
+    const statusMap: Record<string, { label: string; color: string }> = {
+      pending: { label: 'Chờ xử lý', color: 'yellow' },
+      processing: { label: 'Đang xử lý', color: 'blue' },
+      shipping: { label: 'Đang giao', color: 'blue' },
+      completed: { label: 'Hoàn thành', color: 'green' },
+      cancelled: { label: 'Đã hủy', color: 'red' }
+    }
+
+    const paymentLabel = (method?: string) => {
+      const cod = method?.toLowerCase().includes('cod')
+      return cod ? { status: 'unpaid', label: 'Chưa thanh toán' } : { status: 'paid', label: 'Đã thanh toán' }
+    }
+
+    const items = rows.map((o) => {
+      const first = o.items?.[0]
+      const more = Math.max((o.items?.length || 0) - 1, 0)
+      const sm = statusMap[o.status] || { label: o.status, color: 'yellow' }
+      const pay = paymentLabel(o.shipping_info?.payment_method)
+      const created = o.created_at ? new Date(o.created_at) : new Date()
+      const created_at_display = created.toLocaleDateString('vi-VN')
+      const created_time_display = created.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      return {
+        id: o._id,
+        order_code: o.order_code,
+        customer: {
+          id: o.user?._id,
+          name: o.user?.full_name || o.shipping_info?.receiver_name || '',
+          email: o.user?.email || o.shipping_info?.email || '',
+          avatar_url: o.user?.avatar || ''
+        },
+        product_summary: first ? `${first.name} (x${first.quantity})` : '',
+        product_more_count: more,
+        created_at: o.created_at,
+        created_at_display,
+        created_time_display,
+        total: o.cost_summary?.total || 0,
+        total_display: fmtMoney(o.cost_summary?.total || 0),
+        payment_status: pay.status,
+        payment_status_label: pay.label,
+        status: o.status,
+        status_label: sm.label,
+        status_color: sm.color
+      }
+    })
+
+    const startIdx = total === 0 ? 0 : (page - 1) * limit + 1
+    const endIdx = Math.min(page * limit, total)
+    return {
+      items,
+      meta: {
+        total_items: total,
+        total_pages: Math.ceil(total / limit) || 1,
+        current_page: page,
+        limit,
+        showing_text:
+          total === 0
+            ? 'Không có đơn hàng nào'
+            : `Hiển thị ${startIdx}-${endIdx} trong số ${new Intl.NumberFormat('vi-VN').format(total)} đơn hàng`
+      }
+    }
+  }
   async getAdminProductDetail(id: string) {
     const _id = new ObjectId(id)
     const p = await databaseServices.products.findOne({ _id })
