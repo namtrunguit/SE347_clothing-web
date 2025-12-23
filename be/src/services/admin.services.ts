@@ -1,5 +1,6 @@
 import databaseServices from './database.services'
 import { OrderStatus } from '~/models/schemas/Order.schema'
+import { ObjectId } from 'mongodb'
 
 function startOfDay(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate())
@@ -12,6 +13,193 @@ function addDays(date: Date, days: number) {
 }
 
 class AdminService {
+  async getAdminProducts(params: {
+    page?: number
+    limit?: number
+    keyword?: string
+    category_id?: string
+    status?: 'active' | 'out_of_stock' | 'low_stock' | 'draft'
+    sort_by?: string
+    order?: 'asc' | 'desc'
+  }) {
+    const page = params.page && params.page > 0 ? params.page : 1
+    const limit = params.limit && params.limit > 0 ? params.limit : 10
+
+    const match: any = { $or: [{ deleted_at: { $exists: false } }, { deleted_at: null }] }
+
+    // keyword: search by name or slug (fallback for SKU)
+    if (params.keyword) {
+      const regex = new RegExp(params.keyword, 'i')
+      match.$or = [{ name: regex }, { slug: regex }]
+    }
+
+    // category: accept slug or ObjectId string
+    if (params.category_id) {
+      let catId: ObjectId | undefined
+      try {
+        catId = new ObjectId(params.category_id)
+      } catch (_) {
+        // not a valid ObjectId, try slug
+      }
+
+      if (catId) {
+        match.category = catId
+      } else {
+        const cat = await databaseServices.categories.findOne({ slug: params.category_id })
+        if (cat?._id) match.category = cat._id
+      }
+    }
+    // status mapping
+    if (params.status === 'out_of_stock') {
+      match.quantity = 0
+    } else if (params.status === 'low_stock') {
+      match.quantity = { $gt: 0, $lt: 10 }
+    } else if (params.status === 'active') {
+      match.quantity = { $gt: 0 }
+    }
+
+    // sorting
+    const sort: any = {}
+    const sortBy = params.sort_by || 'created_at'
+    sort[sortBy] = params.order === 'asc' ? 1 : -1
+
+    const skip = (page - 1) * limit
+
+    const [items, total] = await Promise.all([
+      databaseServices.products.find(match).sort(sort).skip(skip).limit(limit).toArray(),
+      databaseServices.products.countDocuments(match)
+    ])
+
+    // fetch categories for name mapping
+    const categoryIds = Array.from(
+      new Set(items.map((p) => (p.category ? p.category.toString() : undefined)).filter((v): v is string => Boolean(v)))
+    ).map((id) => new ObjectId(id))
+
+    const categories = categoryIds.length
+      ? await databaseServices.categories
+          .find({ _id: { $in: categoryIds } })
+          .project({ name: 1 })
+          .toArray()
+      : []
+
+    const catMap = new Map(categories.map((c) => [c._id?.toString(), c.name]))
+
+    const toVnCurrency = (n: number) => `${new Intl.NumberFormat('vi-VN').format(n)}đ`
+    const mapStatus = (qty: number) => {
+      if (!qty || qty === 0)
+        return { stock_status: 'out_of_stock', status: 'out_of_stock', status_label: 'Hết hàng', status_color: 'red' }
+      if (qty > 0 && qty < 10)
+        return { stock_status: 'low_stock', status: 'active', status_label: 'Sắp hết', status_color: 'yellow' }
+      return { stock_status: 'in_stock', status: 'active', status_label: 'Đang bán', status_color: 'green' }
+    }
+
+    const mapped = items.map((p) => {
+      const qty = p.quantity ?? 0
+      const m = mapStatus(qty)
+      return {
+        id: p._id,
+        name: p.name,
+        sku: p.slug,
+        thumbnail_url: p.image,
+        category_name: catMap.get(p.category?.toString()) || '',
+        price: p.price,
+        price_display: toVnCurrency(p.price || 0),
+        stock_quantity: qty,
+        stock_status: m.stock_status,
+        status: m.status,
+        status_label: m.status_label,
+        status_color: m.status_color
+      }
+    })
+
+    const startIdx = total === 0 ? 0 : (page - 1) * limit + 1
+    const endIdx = Math.min(page * limit, total)
+
+    return {
+      items: mapped,
+      meta: {
+        total_items: total,
+        total_pages: Math.ceil(total / limit) || 1,
+        current_page: page,
+        limit,
+        showing_text:
+          total === 0 ? 'Không có sản phẩm nào' : `Hiển thị ${startIdx}-${endIdx} trên tổng số ${total} sản phẩm`
+      }
+    }
+  }
+  async getAdminProductDetail(id: string) {
+    const _id = new ObjectId(id)
+    const p = await databaseServices.products.findOne({ _id })
+    if (!p) return null
+    const cat = p.category
+      ? await databaseServices.categories.findOne({ _id: p.category }, { projection: { name: 1 } })
+      : null
+    return {
+      ...p,
+      category_name: cat?.name || ''
+    }
+  }
+
+  async updateAdminProduct(
+    id: string,
+    payload: {
+      name?: string
+      price?: number
+      quantity?: number
+      category_id?: string
+      image?: string
+      description?: string
+      is_featured?: boolean
+    }
+  ) {
+    const _id = new ObjectId(id)
+    const set: any = { updated_at: new Date() }
+    if (payload.name !== undefined) set.name = payload.name
+    if (payload.price !== undefined) set.price = payload.price
+    if (payload.quantity !== undefined) set.quantity = payload.quantity
+    if (payload.image !== undefined) set.image = payload.image
+    if (payload.description !== undefined) set.description = payload.description
+    if (payload.is_featured !== undefined) set.is_featured = payload.is_featured
+    if (payload.category_id) {
+      let catId: ObjectId | undefined
+      try {
+        catId = new ObjectId(payload.category_id)
+      } catch (_) {
+        // ignore invalid ObjectId, will try slug fallback
+      }
+      if (catId) {
+        set.category = catId
+      } else {
+        const cat = await databaseServices.categories.findOne({ slug: payload.category_id })
+        if (cat?._id) set.category = cat._id
+      }
+    }
+
+    await databaseServices.products.updateOne({ _id }, { $set: set })
+    return this.getAdminProductDetail(id)
+  }
+
+  async deleteAdminProduct(id: string) {
+    const _id = new ObjectId(id)
+    await databaseServices.products.updateOne({ _id }, { $set: { deleted_at: new Date(), updated_at: new Date() } })
+    return { message: 'Đã xóa sản phẩm (soft delete) thành công' }
+  }
+  async getAdminProductsMetadata() {
+    const categories = await databaseServices.categories
+      .find({}, { projection: { name: 1, slug: 1 } })
+      .sort({ name: 1 })
+      .toArray()
+
+    const formatted = categories.map((c) => ({ id: c._id, name: c.name, slug: c.slug }))
+
+    const statuses = [
+      { value: 'active', label: 'Đang bán' },
+      { value: 'out_of_stock', label: 'Hết hàng' },
+      { value: 'draft', label: 'Bản nháp' }
+    ]
+
+    return { categories: formatted, statuses }
+  }
   async getDashboardStats(params?: { start_date?: string; end_date?: string }) {
     const now = new Date()
     const todayStart = startOfDay(now)
