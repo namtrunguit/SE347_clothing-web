@@ -66,3 +66,23 @@ export const adminDeleteProductController = async (req: Request, res: Response) 
   const data = await adminService.deleteAdminProduct(id)
   return res.json({ message: data.message })
 }
+
+export const adminOrdersStatsController = async (req: Request, res: Response) => {
+  const data = await adminService.getAdminOrderStats()
+  return res.json({ message: 'Get admin order stats successfully', data })
+}
+
+export const adminGetOrdersController = async (req: Request, res: Response) => {
+  const { page, limit, keyword, status, date_from, date_to, sort_by, order } = req.query
+  const data = await adminService.getAdminOrders({
+    page: page ? Number(page) : undefined,
+    limit: limit ? Number(limit) : undefined,
+    keyword: keyword as string,
+    status: status as any,
+    date_from: date_from as string,
+    date_to: date_to as string,
+    sort_by: sort_by as string,
+    order: order as any
+  })
+  return res.json({ message: 'Get admin orders successfully', data })
+}
