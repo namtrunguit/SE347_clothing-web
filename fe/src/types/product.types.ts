@@ -41,7 +41,7 @@ export interface ProductFilters {
   limit?: number
   category_slug?: string
   name?: string
-  sort_by?: 'price' | 'created_at' | 'sold' | 'rating'
+  sort_by?: 'price' | 'createdAt' | 'created_at' | 'sold' | 'view' | 'rating'
   order?: 'asc' | 'desc'
   price_min?: number
   price_max?: number
@@ -50,12 +50,17 @@ export interface ProductFilters {
 }
 
 export interface Banner {
-  _id: string
+  _id?: string
+  id?: string | number
   title?: string
+  subtitle?: string
   image: string
+  image_url?: string
   link?: string
+  cta_text?: string
   position?: string
   is_active?: boolean
+  order?: number
   created_at?: string
   updated_at?: string
 }

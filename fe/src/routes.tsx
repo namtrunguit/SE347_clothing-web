@@ -25,6 +25,7 @@ const Contact = lazy(() => import('@/pages/Contact'))
 const Terms = lazy(() => import('@/pages/Terms'))
 const SizeGuide = lazy(() => import('@/pages/SizeGuide'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+const Error500 = lazy(() => import('@/pages/Error500'))
 
 // Admin pages
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'))
@@ -195,6 +196,16 @@ export const routes: RouteObject[] = [
     ),
   },
   // 404 Not Found
+  {
+    path: '/404',
+    element: <NotFound />,
+  },
+  // 500 - Server Error
+  {
+    path: '/500',
+    element: <Error500 />,
+  },
+  // Catch all - redirect to 404
   {
     path: '*',
     element: <NotFound />,
