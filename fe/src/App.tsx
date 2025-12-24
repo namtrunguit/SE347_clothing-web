@@ -1,18 +1,28 @@
+import { BrowserRouter, useRoutes } from 'react-router-dom'
+import { Suspense } from 'react'
+import { routes } from './routes'
+
+const AppRoutes = () => {
+  const element = useRoutes(routes)
+  return element
+}
+
 function App() {
   return (
-    <div className="bg-background-light dark:bg-background-dark text-text-main dark:text-white transition-colors duration-200 min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-primary font-display">
-          YORI Fashion
-        </h1>
-        <p className="mt-4 text-text-sub">
-          Frontend React project đã được setup thành công!
-        </p>
-        <p className="mt-2 text-sm text-text-sub">
-          TailwindCSS đã được cấu hình và hoạt động.
-        </p>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-text-sub">Đang tải...</p>
+            </div>
+          </div>
+        }
+      >
+        <AppRoutes />
+      </Suspense>
+    </BrowserRouter>
   )
 }
 
