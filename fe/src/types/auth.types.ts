@@ -19,9 +19,9 @@ export enum UserRole {
 }
 
 export interface LoginRequest {
-  email?: string
-  username?: string
+  email: string
   password: string
+  remember_me?: boolean
 }
 
 export interface LoginResponse {
@@ -31,11 +31,12 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  username: string
+  first_name: string
+  last_name: string
   email: string
   password: string
-  confirm_password: string
-  date_of_birth?: string
+  password_confirmation: string
+  agree_terms: boolean
 }
 
 export interface RegisterResponse {
@@ -55,11 +56,12 @@ export interface ForgotPasswordRequest {
 
 export interface ResetPasswordRequest {
   token: string
+  email: string
   password: string
-  confirm_password: string
+  password_confirmation: string
 }
 
 export interface VerifyForgotPasswordTokenRequest {
-  token: string
+  forgot_password_token: string
 }
 
