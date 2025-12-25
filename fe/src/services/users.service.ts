@@ -95,7 +95,7 @@ export const uploadAvatar = async (file: File): Promise<string> => {
       }
     )
 
-    return response.data.data.avatar_url || response.data.data.avatar
+    return response.data.data.avatar_url || ''
   } catch (error: any) {
     throw error
   }

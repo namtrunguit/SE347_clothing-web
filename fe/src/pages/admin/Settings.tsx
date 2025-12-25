@@ -7,7 +7,6 @@ import FileUpload from '@/components/admin/FileUpload'
 import Spinner from '@/components/common/Spinner'
 import { useToast } from '@/contexts/ToastContext'
 import * as adminService from '@/services/admin.service'
-import { ROUTES } from '@/utils/constants'
 import type { Settings } from '@/types/settings.types'
 
 const AdminSettings = () => {

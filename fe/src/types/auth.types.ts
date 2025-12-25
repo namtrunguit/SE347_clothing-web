@@ -6,6 +6,7 @@ export interface User {
   full_name: string
   email: string
   role: UserRole
+  status?: 'active' | 'inactive'
   address?: string
   avatar?: string
   phonenumber?: string

@@ -1,7 +1,7 @@
 import api from './api'
 import { API_ENDPOINTS } from '@/utils/constants'
 import type { Product, ProductFilters } from '@/types'
-import type { ApiResponse, PaginatedApiResponse } from '@/types/api.types'
+import type { ApiResponse } from '@/types/api.types'
 
 /**
  * Interface cho products response với pagination

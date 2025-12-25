@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios'
-import { getToken, removeToken, getRefreshToken, clearTokens } from '@/utils/storage'
+import { getToken, getRefreshToken, clearTokens } from '@/utils/storage'
 
 // Tạo Axios instance với baseURL
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
@@ -24,7 +24,9 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     // Log request để debug
-    console.log('API Request:', config.method?.toUpperCase(), config.url, config.baseURL + config.url)
+    const url = config.url || ''
+    const baseURL = config.baseURL || ''
+    console.log('API Request:', config.method?.toUpperCase(), url, baseURL + url)
     return config
   },
   (error: AxiosError) => {

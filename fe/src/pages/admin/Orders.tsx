@@ -15,7 +15,7 @@ import { OrderStatus, type Order } from '@/types'
 
 const AdminOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { showSuccess, showError } = useToast()
+  const { showError } = useToast()
 
   const [orders, setOrders] = useState<Order[]>([])
   const [orderStats, setOrderStats] = useState<adminService.OrderStats | null>(null)
@@ -110,7 +110,7 @@ const AdminOrders = () => {
       header: 'Khách hàng',
       render: (order) => (
         <div>
-          <p className="font-medium">{order.shipping_info?.full_name || 'N/A'}</p>
+          <p className="font-medium">{order.shipping_info?.receiver_name || 'N/A'}</p>
           <p className="text-xs text-text-sub dark:text-gray-400">
             {order.shipping_info?.email || order.shipping_info?.phone || ''}
           </p>
@@ -122,7 +122,7 @@ const AdminOrders = () => {
       header: 'Ngày đặt',
       sortable: true,
       render: (order) => (
-        <span className="text-sm">{formatDate(order.createdAt)}</span>
+        <span className="text-sm">{formatDate(order.created_at || '')}</span>
       ),
     },
     {
@@ -130,7 +130,7 @@ const AdminOrders = () => {
       header: 'Tổng tiền',
       sortable: true,
       render: (order) => (
-        <span className="font-medium">{formatPrice(order.total || 0)}</span>
+        <span className="font-medium">{formatPrice(order.cost_summary?.total || 0)}</span>
       ),
     },
     {
