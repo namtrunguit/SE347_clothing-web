@@ -1,5 +1,5 @@
 # -------- Builder stage --------
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install deps
@@ -15,7 +15,7 @@ COPY src ./src
 RUN npm run build
 
 # -------- Runtime stage --------
-FROM node:18-alpine AS runtime
+FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -28,6 +28,9 @@ COPY --from=builder /app/dist ./dist
 
 # Copy OpenAPI docs used at runtime
 COPY src/docs/openapi ./src/docs/openapi
+
+# Copy data files used at runtime (locations.json)
+COPY src/data ./src/data
 
 EXPOSE 5000
 CMD ["node", "dist/index.js"]
