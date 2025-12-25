@@ -1,5 +1,13 @@
 import { ObjectId } from 'mongodb'
 
+export enum ProductStatus {
+  Active = 'active',
+  Inactive = 'inactive',
+  OutOfStock = 'out_of_stock',
+  LowStock = 'low_stock',
+  Draft = 'draft'
+}
+
 interface ProductType {
   _id?: ObjectId
   name: string
@@ -16,6 +24,7 @@ interface ProductType {
   rating?: number
   colors?: string[]
   sizes?: string[]
+  status?: ProductStatus
   is_featured?: boolean
   created_at?: Date
   updated_at?: Date
@@ -37,6 +46,7 @@ export default class Product {
   rating: number
   colors: string[]
   sizes: string[]
+  status: ProductStatus
   is_featured: boolean
   created_at: Date
   updated_at: Date
@@ -57,6 +67,7 @@ export default class Product {
     this.rating = product.rating || 0
     this.colors = product.colors || []
     this.sizes = product.sizes || []
+    this.status = product.status || ProductStatus.Active
     this.is_featured = product.is_featured || false
     this.created_at = product.created_at || new Date()
     this.updated_at = product.updated_at || new Date()

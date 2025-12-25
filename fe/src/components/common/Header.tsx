@@ -2,10 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/utils/constants'
 import { useAuth } from '@/hooks/useAuth'
+import { useCart } from '@/hooks/useCart'
+import { useTheme } from '@/contexts/ThemeContext'
 import { UserRole } from '@/types'
 
 const Header = () => {
   const { isAuthenticated, user, logout } = useAuth()
+  const { totalItems } = useCart()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -29,10 +32,7 @@ const Header = () => {
     }
   }, [showUserMenu])
 
-  const handleToggleDarkMode = () => {
-    const html = document.documentElement
-    html.classList.toggle('dark')
-  }
+  const { toggleTheme } = useTheme()
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -184,18 +184,22 @@ const Header = () => {
           aria-label="Shopping cart"
         >
           <span className="material-symbols-outlined">shopping_cart</span>
-          {/* Cart badge - TODO: Get from cart context */}
-          <span className="absolute top-1.5 right-1.5 size-2.5 bg-primary rounded-full border border-white dark:border-background-dark"></span>
+          {/* Cart badge */}
+          {totalItems > 0 && (
+            <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-primary rounded-full border border-white dark:border-background-dark flex items-center justify-center text-[10px] font-bold text-white px-1">
+              {totalItems > 99 ? '99+' : totalItems}
+            </span>
+          )}
         </Link>
 
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={handleToggleDarkMode}
-          className="flex items-center justify-center rounded-lg size-10 hover:bg-gray-100 dark:hover:bg-gray-700 text-text-main dark:text-gray-200 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          <span className="material-symbols-outlined">dark_mode</span>
-        </button>
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center rounded-lg size-10 hover:bg-gray-100 dark:hover:bg-gray-700 text-text-main dark:text-gray-200 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              <span className="material-symbols-outlined">dark_mode</span>
+            </button>
 
         {/* Mobile Menu Toggle */}
         <button

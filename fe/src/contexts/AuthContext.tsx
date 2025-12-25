@@ -4,6 +4,7 @@ import { login as loginService, register as registerService, logout as logoutSer
 import { getToken, clearTokens } from '@/utils/storage'
 import type { User, LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '@/types'
 import { ROUTES } from '@/utils/constants'
+import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 
 interface AuthContextType {
   user: User | null
@@ -12,6 +13,7 @@ interface AuthContextType {
   login: (data: LoginRequest) => Promise<void>
   register: (data: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
+  updateUser: (user: User) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -24,6 +26,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
+
+  // Tự động refresh token trước khi hết hạn
+  useTokenRefresh()
 
   // Check authentication status on mount
   useEffect(() => {
@@ -90,6 +95,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser)
+    localStorage.setItem('user', JSON.stringify(updatedUser))
+  }
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -97,6 +107,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     logout,
+    updateUser,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

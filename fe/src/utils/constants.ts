@@ -2,13 +2,18 @@
 export const API_ENDPOINTS = {
   // Auth
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    SOCIAL_LOGIN: '/auth/social-login',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
-    VERIFY_FORGOT_PASSWORD: '/auth/verify-forgot-password',
+    LOGIN: '/users/login',
+    REGISTER: '/users/register',
+    LOGOUT: '/users/logout',
+    REFRESH_TOKEN: '/users/refresh-token',
+    SOCIAL_LOGIN: '/users/social-login',
+    FORGOT_PASSWORD: '/users/forgot-password',
+    RESET_PASSWORD: '/users/reset-password',
+    VERIFY_FORGOT_PASSWORD: '/users/verify-forgot-password',
+  },
+  USERS: {
+    ME: '/users/me',
+    UPLOAD_AVATAR: '/users/me/avatar',
   },
   // Products
   PRODUCTS: {

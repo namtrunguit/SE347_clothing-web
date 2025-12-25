@@ -6,6 +6,7 @@ import Category from '~/models/schemas/Category.schema'
 import Product from '~/models/schemas/Product.schema'
 import Cart from '~/models/schemas/Cart.schema'
 import Order from '~/models/schemas/Order.schema'
+import Banner from '~/models/schemas/Banner.schema'
 config({ quiet: true }) // tuỳ version dotenv
 
 // Connection URL
@@ -63,6 +64,11 @@ class DatabaseService {
   // Contacts collection (store contact form submissions)
   get contacts(): Collection<any> {
     return this.db.collection(process.env.DB_CONTACTS_COLLECTION || 'contacts')
+  }
+
+  // Banners collection
+  get banners(): Collection<Banner> {
+    return this.db.collection(process.env.DB_BANNERS_COLLECTION || 'banners')
   }
 }
 export default new DatabaseService()

@@ -101,10 +101,10 @@ const ResetPassword = () => {
       })
       setIsSuccess(true)
 
-      // Redirect to login sau 3 giây
+      // Redirect to home sau 2 giây (đã tự động đăng nhập)
       setTimeout(() => {
-        navigate(ROUTES.LOGIN)
-      }, 3000)
+        navigate(ROUTES.HOME)
+      }, 2000)
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
@@ -146,12 +146,11 @@ const ResetPassword = () => {
                 Đặt lại mật khẩu thành công!
               </h1>
               <p className="text-sm text-text-sub dark:text-gray-400 mb-6">
-                Mật khẩu của bạn đã được đặt lại. Bạn sẽ được chuyển đến trang đăng
-                nhập trong giây lát...
+                Mật khẩu của bạn đã được đặt lại và bạn đã được tự động đăng nhập. Bạn sẽ được chuyển đến trang chủ trong giây lát...
               </p>
-              <Link to={ROUTES.LOGIN}>
+              <Link to={ROUTES.HOME}>
                 <Button variant="primary" size="lg" className="w-full">
-                  Đăng nhập ngay
+                  Về trang chủ
                 </Button>
               </Link>
             </div>

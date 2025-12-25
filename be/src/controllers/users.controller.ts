@@ -44,6 +44,19 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
   return res.status(HTTP_STATUS.OK).json({ message: USERS_MESSAGES.LOGOUT_SUCCESS })
 }
 
+export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { refresh_token } = req.body
+    const result = await usersServices.refreshToken(refresh_token)
+    return res.status(HTTP_STATUS.OK).json({
+      message: USERS_MESSAGES.REFRESH_TOKEN_SUCCESS || 'Refresh token success',
+      data: result
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const socialLoginController = async (
   req: Request<ParamsDictionary, any, SocialLoginRequestBody>,
   res: Response,
@@ -73,9 +86,10 @@ export const resetPasswordController = async (
   next: NextFunction
 ) => {
   const { _id } = (req as any).user
-  await usersServices.resetPassword(_id.toString(), req.body.password)
+  const result = await usersServices.resetPassword(_id.toString(), req.body.password)
   return res.status(HTTP_STATUS.OK).json({
-    message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS
+    message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS,
+    data: result
   })
 }
 
@@ -87,4 +101,66 @@ export const verifyForgotPasswordTokenController = async (
   return res.json({
     message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS
   })
+}
+
+export const getMeController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.decoded_authorization as any
+    const user = await usersServices.getMe(userId)
+    return res.status(HTTP_STATUS.OK).json({
+      message: USERS_MESSAGES.GET_USER_SUCCESS,
+      data: user
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const updateMeController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.decoded_authorization as any
+    const user = await usersServices.updateMe(userId, req.body)
+    return res.status(HTTP_STATUS.OK).json({
+      message: USERS_MESSAGES.UPDATE_USER_SUCCESS,
+      data: user
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const uploadAvatarController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.decoded_authorization as any
+    
+    // Check if file is uploaded via multer
+    const file = (req as any).file
+    if (file) {
+      // File uploaded via multer - convert to base64 or save to storage
+      // For now, convert to base64 data URL
+      const base64 = file.buffer.toString('base64')
+      const avatar_url = `data:${file.mimetype};base64,${base64}`
+      
+      const result = await usersServices.uploadAvatar(userId, avatar_url)
+      return res.status(HTTP_STATUS.OK).json({
+        message: USERS_MESSAGES.UPLOAD_AVATAR_SUCCESS,
+        data: result
+      })
+    }
+    
+    // Fallback: accept avatar_url in body (for backward compatibility)
+    const { avatar_url } = req.body
+    if (!avatar_url) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        message: 'Avatar file or URL is required'
+      })
+    }
+    const result = await usersServices.uploadAvatar(userId, avatar_url)
+    return res.status(HTTP_STATUS.OK).json({
+      message: USERS_MESSAGES.UPLOAD_AVATAR_SUCCESS,
+      data: result
+    })
+  } catch (error) {
+    next(error)
+  }
 }

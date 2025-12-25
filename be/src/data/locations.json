@@ -9,7 +9,14 @@
         "name": "Quận 1",
         "wards": [
           { "id": "26734", "name": "Phường Bến Nghé" },
-          { "id": "26740", "name": "Phường Bến Thành" }
+          { "id": "26740", "name": "Phường Bến Thành" },
+          { "id": "26743", "name": "Phường Cô Giang" },
+          { "id": "26746", "name": "Phường Cầu Kho" },
+          { "id": "26749", "name": "Phường Cầu Ông Lãnh" },
+          { "id": "26752", "name": "Phường Đa Kao" },
+          { "id": "26755", "name": "Phường Nguyễn Thái Bình" },
+          { "id": "26758", "name": "Phường Phạm Ngũ Lão" },
+          { "id": "26761", "name": "Phường Tân Định" }
         ]
       },
       {
@@ -17,7 +24,101 @@
         "name": "Quận 12",
         "wards": [
           { "id": "26743", "name": "Phường Tân Chánh Hiệp" },
-          { "id": "26746", "name": "Phường Trung Mỹ Tây" }
+          { "id": "26746", "name": "Phường Trung Mỹ Tây" },
+          { "id": "26749", "name": "Phường An Phú Đông" },
+          { "id": "26752", "name": "Phường Đông Hưng Thuận" },
+          { "id": "26755", "name": "Phường Hiệp Thành" },
+          { "id": "26758", "name": "Phường Tân Hưng Thuận" },
+          { "id": "26761", "name": "Phường Tân Thới Hiệp" },
+          { "id": "26764", "name": "Phường Tân Thới Nhất" },
+          { "id": "26767", "name": "Phường Thạnh Lộc" },
+          { "id": "26770", "name": "Phường Thạnh Xuân" }
+        ]
+      },
+      {
+        "id": "762",
+        "name": "Quận Bình Thạnh",
+        "wards": [
+          { "id": "26773", "name": "Phường 1" },
+          { "id": "26776", "name": "Phường 2" },
+          { "id": "26779", "name": "Phường 3" },
+          { "id": "26782", "name": "Phường 5" },
+          { "id": "26785", "name": "Phường 6" },
+          { "id": "26788", "name": "Phường 7" },
+          { "id": "26791", "name": "Phường 11" },
+          { "id": "26794", "name": "Phường 12" },
+          { "id": "26797", "name": "Phường 13" },
+          { "id": "26800", "name": "Phường 14" },
+          { "id": "26803", "name": "Phường 15" },
+          { "id": "26806", "name": "Phường 17" },
+          { "id": "26809", "name": "Phường 19" },
+          { "id": "26812", "name": "Phường 21" },
+          { "id": "26815", "name": "Phường 22" },
+          { "id": "26818", "name": "Phường 24" },
+          { "id": "26821", "name": "Phường 25" },
+          { "id": "26824", "name": "Phường 26" },
+          { "id": "26827", "name": "Phường 27" },
+          { "id": "26830", "name": "Phường 28" }
+        ]
+      },
+      {
+        "id": "763",
+        "name": "Quận Tân Bình",
+        "wards": [
+          { "id": "26833", "name": "Phường 1" },
+          { "id": "26836", "name": "Phường 2" },
+          { "id": "26839", "name": "Phường 3" },
+          { "id": "26842", "name": "Phường 4" },
+          { "id": "26845", "name": "Phường 5" },
+          { "id": "26848", "name": "Phường 6" },
+          { "id": "26851", "name": "Phường 7" },
+          { "id": "26854", "name": "Phường 8" },
+          { "id": "26857", "name": "Phường 9" },
+          { "id": "26860", "name": "Phường 10" },
+          { "id": "26863", "name": "Phường 11" },
+          { "id": "26866", "name": "Phường 12" },
+          { "id": "26869", "name": "Phường 13" },
+          { "id": "26872", "name": "Phường 14" },
+          { "id": "26875", "name": "Phường 15" }
+        ]
+      },
+      {
+        "id": "764",
+        "name": "Quận Tân Phú",
+        "wards": [
+          { "id": "26878", "name": "Phường Tân Sơn Nhì" },
+          { "id": "26881", "name": "Phường Tây Thạnh" },
+          { "id": "26884", "name": "Phường Sơn Kỳ" },
+          { "id": "26887", "name": "Phường Tân Quý" },
+          { "id": "26890", "name": "Phường Tân Thành" },
+          { "id": "26893", "name": "Phường Phú Thọ Hòa" },
+          { "id": "26896", "name": "Phường Phú Thạnh" },
+          { "id": "26899", "name": "Phường Phú Trung" },
+          { "id": "26902", "name": "Phường Hòa Thạnh" },
+          { "id": "26905", "name": "Phường Hiệp Tân" },
+          { "id": "26908", "name": "Phường Tân Thới Hòa" }
+        ]
+      },
+      {
+        "id": "765",
+        "name": "Quận Gò Vấp",
+        "wards": [
+          { "id": "26911", "name": "Phường 1" },
+          { "id": "26914", "name": "Phường 3" },
+          { "id": "26917", "name": "Phường 4" },
+          { "id": "26920", "name": "Phường 5" },
+          { "id": "26923", "name": "Phường 6" },
+          { "id": "26926", "name": "Phường 7" },
+          { "id": "26929", "name": "Phường 8" },
+          { "id": "26932", "name": "Phường 9" },
+          { "id": "26935", "name": "Phường 10" },
+          { "id": "26938", "name": "Phường 11" },
+          { "id": "26941", "name": "Phường 12" },
+          { "id": "26944", "name": "Phường 13" },
+          { "id": "26947", "name": "Phường 14" },
+          { "id": "26950", "name": "Phường 15" },
+          { "id": "26953", "name": "Phường 16" },
+          { "id": "26956", "name": "Phường 17" }
         ]
       }
     ]
@@ -32,7 +133,19 @@
         "name": "Quận Ba Đình",
         "wards": [
           { "id": "00001", "name": "Phường Phúc Xá" },
-          { "id": "00004", "name": "Phường Trúc Bạch" }
+          { "id": "00004", "name": "Phường Trúc Bạch" },
+          { "id": "00006", "name": "Phường Vĩnh Phúc" },
+          { "id": "00007", "name": "Phường Cống Vị" },
+          { "id": "00008", "name": "Phường Liễu Giai" },
+          { "id": "00010", "name": "Phường Nguyễn Trung Trực" },
+          { "id": "00013", "name": "Phường Quán Thánh" },
+          { "id": "00016", "name": "Phường Ngọc Hà" },
+          { "id": "00019", "name": "Phường Điện Biên" },
+          { "id": "00022", "name": "Phường Đội Cấn" },
+          { "id": "00025", "name": "Phường Ngọc Khánh" },
+          { "id": "00028", "name": "Phường Kim Mã" },
+          { "id": "00031", "name": "Phường Giảng Võ" },
+          { "id": "00034", "name": "Phường Thành Công" }
         ]
       },
       {
@@ -40,7 +153,239 @@
         "name": "Quận Hoàn Kiếm",
         "wards": [
           { "id": "00037", "name": "Phường Phúc Tân" },
-          { "id": "00040", "name": "Phường Đồng Xuân" }
+          { "id": "00040", "name": "Phường Đồng Xuân" },
+          { "id": "00043", "name": "Phường Hàng Mã" },
+          { "id": "00046", "name": "Phường Hàng Buồm" },
+          { "id": "00049", "name": "Phường Hàng Đào" },
+          { "id": "00052", "name": "Phường Hàng Bồ" },
+          { "id": "00055", "name": "Phường Cửa Đông" },
+          { "id": "00058", "name": "Phường Lý Thái Tổ" },
+          { "id": "00061", "name": "Phường Hàng Bạc" },
+          { "id": "00064", "name": "Phường Hàng Gai" },
+          { "id": "00067", "name": "Phường Chương Dương Độ" },
+          { "id": "00070", "name": "Phường Hàng Trống" },
+          { "id": "00073", "name": "Phường Cửa Nam" },
+          { "id": "00076", "name": "Phường Hàng Bông" },
+          { "id": "00079", "name": "Phường Tràng Tiền" },
+          { "id": "00082", "name": "Phường Trần Hưng Đạo" },
+          { "id": "00085", "name": "Phường Phan Chu Trinh" },
+          { "id": "00088", "name": "Phường Hàng Bài" }
+        ]
+      },
+      {
+        "id": "003",
+        "name": "Quận Tây Hồ",
+        "wards": [
+          { "id": "00091", "name": "Phường Phú Thượng" },
+          { "id": "00094", "name": "Phường Nhật Tân" },
+          { "id": "00097", "name": "Phường Tứ Liên" },
+          { "id": "00100", "name": "Phường Quảng An" },
+          { "id": "00103", "name": "Phường Xuân La" },
+          { "id": "00106", "name": "Phường Yên Phụ" },
+          { "id": "00109", "name": "Phường Bưởi" },
+          { "id": "00112", "name": "Phường Thụy Khuê" }
+        ]
+      },
+      {
+        "id": "004",
+        "name": "Quận Long Biên",
+        "wards": [
+          { "id": "00115", "name": "Phường Thượng Thanh" },
+          { "id": "00118", "name": "Phường Ngọc Thụy" },
+          { "id": "00121", "name": "Phường Giang Biên" },
+          { "id": "00124", "name": "Phường Đức Giang" },
+          { "id": "00127", "name": "Phường Việt Hưng" },
+          { "id": "00130", "name": "Phường Gia Thụy" },
+          { "id": "00133", "name": "Phường Ngọc Lâm" },
+          { "id": "00136", "name": "Phường Phúc Lợi" },
+          { "id": "00139", "name": "Phường Bồ Đề" },
+          { "id": "00142", "name": "Phường Sài Đồng" },
+          { "id": "00145", "name": "Phường Long Biên" },
+          { "id": "00148", "name": "Phường Thạch Bàn" },
+          { "id": "00151", "name": "Phường Phúc Đồng" },
+          { "id": "00154", "name": "Phường Cự Khối" }
+        ]
+      },
+      {
+        "id": "005",
+        "name": "Quận Cầu Giấy",
+        "wards": [
+          { "id": "00157", "name": "Phường Nghĩa Đô" },
+          { "id": "00160", "name": "Phường Nghĩa Tân" },
+          { "id": "00163", "name": "Phường Mai Dịch" },
+          { "id": "00166", "name": "Phường Dịch Vọng" },
+          { "id": "00169", "name": "Phường Dịch Vọng Hậu" },
+          { "id": "00172", "name": "Phường Quan Hoa" },
+          { "id": "00175", "name": "Phường Yên Hòa" },
+          { "id": "00178", "name": "Phường Trung Hòa" }
+        ]
+      },
+      {
+        "id": "006",
+        "name": "Quận Đống Đa",
+        "wards": [
+          { "id": "00181", "name": "Phường Cát Linh" },
+          { "id": "00184", "name": "Phường Văn Miếu" },
+          { "id": "00187", "name": "Phường Quốc Tử Giám" },
+          { "id": "00190", "name": "Phường Láng Thượng" },
+          { "id": "00193", "name": "Phường Ô Chợ Dừa" },
+          { "id": "00196", "name": "Phường Văn Chương" },
+          { "id": "00199", "name": "Phường Hàng Bột" },
+          { "id": "00202", "name": "Phường Láng Hạ" },
+          { "id": "00205", "name": "Phường Khâm Thiên" },
+          { "id": "00208", "name": "Phường Thổ Quan" },
+          { "id": "00211", "name": "Phường Nam Đồng" },
+          { "id": "00214", "name": "Phường Trung Phụng" },
+          { "id": "00217", "name": "Phường Quang Trung" },
+          { "id": "00220", "name": "Phường Trung Liệt" },
+          { "id": "00223", "name": "Phường Phương Liên" },
+          { "id": "00226", "name": "Phường Thịnh Quang" },
+          { "id": "00229", "name": "Phường Trung Tự" },
+          { "id": "00232", "name": "Phường Kim Liên" },
+          { "id": "00235", "name": "Phường Phương Mai" },
+          { "id": "00238", "name": "Phường Ngã Tư Sở" },
+          { "id": "00241", "name": "Phường Khương Thượng" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "48",
+    "name": "Đà Nẵng",
+    "code": "DN",
+    "districts": [
+      {
+        "id": "490",
+        "name": "Quận Hải Châu",
+        "wards": [
+          { "id": "20203", "name": "Phường Thanh Bình" },
+          { "id": "20206", "name": "Phường Thuận Phước" },
+          { "id": "20209", "name": "Phường Thạch Thang" },
+          { "id": "20212", "name": "Phường Hải Châu I" },
+          { "id": "20215", "name": "Phường Hải Châu II" },
+          { "id": "20218", "name": "Phường Phước Ninh" },
+          { "id": "20221", "name": "Phường Hòa Thuận Tây" },
+          { "id": "20224", "name": "Phường Hòa Thuận Đông" },
+          { "id": "20227", "name": "Phường Nam Dương" },
+          { "id": "20230", "name": "Phường Bình Hiên" },
+          { "id": "20233", "name": "Phường Bình Thuận" },
+          { "id": "20236", "name": "Phường Hòa Cường Bắc" },
+          { "id": "20239", "name": "Phường Hòa Cường Nam" }
+        ]
+      },
+      {
+        "id": "491",
+        "name": "Quận Thanh Khê",
+        "wards": [
+          { "id": "20242", "name": "Phường Thạch Thang" },
+          { "id": "20245", "name": "Phường Thanh Lộc Đán" },
+          { "id": "20248", "name": "Phường Thạc Gián" },
+          { "id": "20251", "name": "Phường Hòa Khê" },
+          { "id": "20254", "name": "Phường Thanh Khê Tây" },
+          { "id": "20257", "name": "Phường Thanh Khê Đông" },
+          { "id": "20260", "name": "Phường Xuân Hà" },
+          { "id": "20263", "name": "Phường Tân Chính" },
+          { "id": "20266", "name": "Phường Chính Gián" },
+          { "id": "20269", "name": "Phường Vĩnh Trung" },
+          { "id": "20272", "name": "Phường Thạc Gián" }
+        ]
+      },
+      {
+        "id": "492",
+        "name": "Quận Sơn Trà",
+        "wards": [
+          { "id": "20275", "name": "Phường An Hải Bắc" },
+          { "id": "20278", "name": "Phường An Hải Đông" },
+          { "id": "20281", "name": "Phường An Hải Tây" },
+          { "id": "20284", "name": "Phường Mân Thái" },
+          { "id": "20287", "name": "Phường Phước Mỹ" },
+          { "id": "20290", "name": "Phường Thọ Quang" },
+          { "id": "20293", "name": "Phường Nại Hiên Đông" },
+          { "id": "20296", "name": "Phường Mỹ An" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "92",
+    "name": "Cần Thơ",
+    "code": "CT",
+    "districts": [
+      {
+        "id": "916",
+        "name": "Quận Ninh Kiều",
+        "wards": [
+          { "id": "31102", "name": "Phường An Hòa" },
+          { "id": "31105", "name": "Phường An Khánh" },
+          { "id": "31108", "name": "Phường An Lạc" },
+          { "id": "31111", "name": "Phường An Nghiệp" },
+          { "id": "31114", "name": "Phường An Phú" },
+          { "id": "31117", "name": "Phường Cái Khế" },
+          { "id": "31120", "name": "Phường Hưng Lợi" },
+          { "id": "31123", "name": "Phường Tân An" },
+          { "id": "31126", "name": "Phường Thới Bình" },
+          { "id": "31129", "name": "Phường Xuân Khánh" },
+          { "id": "31132", "name": "Phường An Thới" },
+          { "id": "31135", "name": "Phường Bùi Hữu Nghĩa" },
+          { "id": "31138", "name": "Phường Long Hòa" },
+          { "id": "31141", "name": "Phường Long Tuyền" },
+          { "id": "31144", "name": "Phường Thới An Đông" },
+          { "id": "31147", "name": "Phường Trà An" },
+          { "id": "31150", "name": "Phường Trà Nóc" }
+        ]
+      },
+      {
+        "id": "917",
+        "name": "Quận Ô Môn",
+        "wards": [
+          { "id": "31153", "name": "Phường Châu Văn Liêm" },
+          { "id": "31156", "name": "Phường Long Hưng" },
+          { "id": "31159", "name": "Phường Phước Thới" },
+          { "id": "31162", "name": "Phường Thới Hòa" },
+          { "id": "31165", "name": "Phường Thới Long" },
+          { "id": "31168", "name": "Phường Thới An" },
+          { "id": "31171", "name": "Phường Thới Thạnh" },
+          { "id": "31174", "name": "Phường Thới Đông" },
+          { "id": "31177", "name": "Phường Thới Xuân" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "36",
+    "name": "Hưng Yên",
+    "code": "HY",
+    "districts": [
+      {
+        "id": "364",
+        "name": "Huyện Văn Lâm",
+        "wards": [
+          { "id": "14119", "name": "Thị trấn Như Quỳnh" },
+          { "id": "14122", "name": "Xã Đại Đồng" },
+          { "id": "14125", "name": "Xã Lạc Đạo" },
+          { "id": "14128", "name": "Xã Chỉ Đạo" },
+          { "id": "14131", "name": "Xã Đình Dù" },
+          { "id": "14134", "name": "Xã Minh Hải" },
+          { "id": "14137", "name": "Xã Lương Tài" },
+          { "id": "14140", "name": "Xã Trưng Trắc" },
+          { "id": "14143", "name": "Xã Lạc Hồng" }
+        ]
+      },
+      {
+        "id": "365",
+        "name": "Huyện Văn Giang",
+        "wards": [
+          { "id": "14146", "name": "Thị trấn Văn Giang" },
+          { "id": "14149", "name": "Xã Xuân Quan" },
+          { "id": "14152", "name": "Xã Cửu Cao" },
+          { "id": "14155", "name": "Xã Phụng Công" },
+          { "id": "14158", "name": "Xã Nghĩa Trụ" },
+          { "id": "14161", "name": "Xã Long Hưng" },
+          { "id": "14164", "name": "Xã Vĩnh Khúc" },
+          { "id": "14167", "name": "Xã Liên Nghĩa" },
+          { "id": "14170", "name": "Xã Tân Tiến" },
+          { "id": "14173", "name": "Xã Thắng Lợi" },
+          { "id": "14176", "name": "Xã Mễ Sở" }
         ]
       }
     ]

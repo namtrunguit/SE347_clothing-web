@@ -6,6 +6,7 @@ import {
   placeOrderController
 } from '~/controllers/checkout.controller'
 import { accessTokenValidator } from '~/middlewares/users.middleware'
+import { validateShippingValidator, placeOrderValidator } from '~/middlewares/checkout.middleware'
 import { wrapRequestHandler } from '~/utils/handler'
 
 const checkoutRouter = Router()
@@ -25,7 +26,12 @@ checkoutRouter.get('/init', accessTokenValidator, wrapRequestHandler(checkoutIni
  * Header: { Authorization: Bearer <access_token> }
  * Body: { full_name, phone, email, province_id, district_id, ward_id, address }
  */
-checkoutRouter.post('/validate-shipping', accessTokenValidator, wrapRequestHandler(validateShippingController))
+checkoutRouter.post(
+  '/validate-shipping',
+  accessTokenValidator,
+  validateShippingValidator,
+  wrapRequestHandler(validateShippingController)
+)
 
 /**
  * Description: Get payment info
@@ -42,6 +48,11 @@ checkoutRouter.get('/payment-info', accessTokenValidator, wrapRequestHandler(get
  * Header: { Authorization: Bearer <access_token> }
  * Body: { payment_method, note, billing_address_same_as_shipping, billing_address, shipping_address, receiver_name, phone, email }
  */
-checkoutRouter.post('/place-order', accessTokenValidator, wrapRequestHandler(placeOrderController))
+checkoutRouter.post(
+  '/place-order',
+  accessTokenValidator,
+  placeOrderValidator,
+  wrapRequestHandler(placeOrderController)
+)
 
 export default checkoutRouter

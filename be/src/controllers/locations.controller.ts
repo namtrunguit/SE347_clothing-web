@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import fs from 'fs'
 import path from 'path'
+import HTTP_STATUS from '~/constants/httpStatus'
 
 const locationsPath = path.resolve('src/data/locations.json')
 const locationsData = JSON.parse(fs.readFileSync(locationsPath, 'utf-8'))
@@ -11,9 +12,9 @@ export const getProvincesController = (req: Request, res: Response) => {
     name: p.name,
     code: p.code
   }))
-  return res.json({
+  return res.status(HTTP_STATUS.OK).json({
     message: 'Get provinces successfully',
-    result: provinces
+    data: provinces
   })
 }
 
@@ -22,18 +23,19 @@ export const getDistrictsController = (req: Request, res: Response) => {
   const province = locationsData.find((p: any) => p.id === province_id)
 
   if (!province) {
-    return res.status(404).json({ message: 'Province not found' })
+    return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Province not found' })
   }
 
   const districts = province.districts.map((d: any) => ({
     id: d.id,
     name: d.name,
-    province_id: province.id
+    province_id: province.id,
+    code: d.code
   }))
 
-  return res.json({
+  return res.status(HTTP_STATUS.OK).json({
     message: 'Get districts successfully',
-    result: districts
+    data: districts
   })
 }
 
@@ -52,17 +54,18 @@ export const getWardsController = (req: Request, res: Response) => {
   }
 
   if (!foundDistrict) {
-    return res.status(404).json({ message: 'District not found' })
+    return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'District not found' })
   }
 
   const wards = foundDistrict.wards.map((w: any) => ({
     id: w.id,
     name: w.name,
-    district_id: foundDistrict.id
+    district_id: foundDistrict.id,
+    code: w.code
   }))
 
-  return res.json({
+  return res.status(HTTP_STATUS.OK).json({
     message: 'Get wards successfully',
-    result: wards
+    data: wards
   })
 }

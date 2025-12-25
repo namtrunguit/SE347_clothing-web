@@ -122,6 +122,6 @@ export const placeOrderController = async (req: Request<ParamsDictionary, any, P
   const result = await ordersServices.createOrder(userId, req.body)
   return res.json({
     message: 'Place order successfully',
-    result
+    data: result
   })
 }

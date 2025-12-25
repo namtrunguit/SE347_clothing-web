@@ -97,7 +97,8 @@ class AdminService {
       const qty = p.quantity ?? 0
       const m = mapStatus(qty)
       return {
-        id: p._id,
+        _id: p._id?.toString() || '',
+        id: p._id?.toString() || '',
         name: p.name,
         sku: p.slug,
         thumbnail_url: p.image,
@@ -116,25 +117,25 @@ class AdminService {
     const endIdx = Math.min(page * limit, total)
 
     return {
-      items: mapped,
-      meta: {
-        total_items: total,
-        total_pages: Math.ceil(total / limit) || 1,
-        current_page: page,
+      products: mapped,
+      pagination: {
+        page,
         limit,
-        showing_text:
-          total === 0 ? 'Không có sản phẩm nào' : `Hiển thị ${startIdx}-${endIdx} trên tổng số ${total} sản phẩm`
+        total_page: Math.ceil(total / limit) || 1,
+        total
       }
     }
   }
   async getAdminOrderStats() {
-    const [total_orders, pending_count, shipping_count, cancelled_count] = await Promise.all([
+    const [total, pending, processing, shipping, completed, cancelled] = await Promise.all([
       databaseServices.orders.countDocuments({}),
       databaseServices.orders.countDocuments({ status: OrderStatus.Pending }),
+      databaseServices.orders.countDocuments({ status: OrderStatus.Processing }),
       databaseServices.orders.countDocuments({ status: OrderStatus.Shipping }),
+      databaseServices.orders.countDocuments({ status: OrderStatus.Completed }),
       databaseServices.orders.countDocuments({ status: OrderStatus.Cancelled })
     ])
-    return { total_orders, pending_count, shipping_count, cancelled_count }
+    return { pending, processing, shipping, completed, cancelled, total }
   }
 
   async getAdminOrders(params: {
@@ -228,17 +229,18 @@ class AdminService {
       const created_at_display = created.toLocaleDateString('vi-VN')
       const created_time_display = created.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
       return {
-        id: o._id,
+        _id: o._id?.toString() || '',
+        id: o._id?.toString() || '',
         order_code: o.order_code,
         customer: {
-          id: o.user?._id,
+          id: o.user?._id?.toString() || '',
           name: o.user?.full_name || o.shipping_info?.receiver_name || '',
           email: o.user?.email || o.shipping_info?.email || '',
           avatar_url: o.user?.avatar || ''
         },
         product_summary: first ? `${first.name} (x${first.quantity})` : '',
         product_more_count: more,
-        created_at: o.created_at,
+        created_at: o.created_at ? o.created_at.toISOString() : undefined,
         created_at_display,
         created_time_display,
         total: o.cost_summary?.total || 0,
@@ -251,19 +253,13 @@ class AdminService {
       }
     })
 
-    const startIdx = total === 0 ? 0 : (page - 1) * limit + 1
-    const endIdx = Math.min(page * limit, total)
     return {
-      items,
-      meta: {
-        total_items: total,
-        total_pages: Math.ceil(total / limit) || 1,
-        current_page: page,
+      orders: items,
+      pagination: {
+        page,
         limit,
-        showing_text:
-          total === 0
-            ? 'Không có đơn hàng nào'
-            : `Hiển thị ${startIdx}-${endIdx} trong số ${new Intl.NumberFormat('vi-VN').format(total)} đơn hàng`
+        total_page: Math.ceil(total / limit) || 1,
+        total
       }
     }
   }
@@ -344,26 +340,12 @@ class AdminService {
     const now = new Date()
     const todayStart = startOfDay(now)
 
-    const [
-      total_users,
-      total_orders,
-      pending_orders,
-      processing_orders,
-      shipping_orders,
-      completed_orders,
-      cancelled_orders
-    ] = await Promise.all([
+    // Count totals (all time)
+    const [total_users, total_orders, total_products] = await Promise.all([
       databaseServices.users.countDocuments({}),
       databaseServices.orders.countDocuments({}),
-      databaseServices.orders.countDocuments({ status: OrderStatus.Pending }),
-      databaseServices.orders.countDocuments({ status: OrderStatus.Processing }),
-      databaseServices.orders.countDocuments({ status: OrderStatus.Shipping }),
-      databaseServices.orders.countDocuments({ status: OrderStatus.Completed }),
-      databaseServices.orders.countDocuments({ status: OrderStatus.Cancelled })
+      databaseServices.products.countDocuments({ $or: [{ deleted_at: { $exists: false } }, { deleted_at: null }] })
     ])
-
-    const new_users_today = await databaseServices.users.countDocuments({ createdAt: { $gte: todayStart } })
-    const new_orders_today = await databaseServices.orders.countDocuments({ created_at: { $gte: todayStart } })
 
     // revenue in optional date range (default: total non-cancelled)
     const match: any = { status: { $ne: OrderStatus.Cancelled } }
@@ -380,18 +362,12 @@ class AdminService {
     const total_revenue = revenueAgg[0]?.revenue || 0
 
     return {
-      counters: {
-        total_users,
-        total_orders,
-        total_revenue,
-        pending_orders,
-        processing_orders,
-        shipping_orders,
-        completed_orders,
-        cancelled_orders,
-        new_users_today,
-        new_orders_today
-      }
+      total_revenue,
+      total_orders,
+      total_customers: total_users,
+      total_products
+      // Note: revenue_change, orders_change, customers_change, products_change are optional
+      // and can be calculated on frontend if needed
     }
   }
 
@@ -407,110 +383,64 @@ class AdminService {
           _id: {
             day: { $dateToString: { format: '%Y-%m-%d', date: '$created_at', timezone: 'Asia/Ho_Chi_Minh' } }
           },
-          amount: { $sum: '$cost_summary.total' }
+          revenue: { $sum: '$cost_summary.total' },
+          orders: { $sum: 1 }
         }
       },
-      { $project: { _id: 0, date: '$_id.day', amount: 1 } },
+      { $project: { _id: 0, date: '$_id.day', revenue: 1, orders: 1 } },
       { $sort: { date: 1 } }
     ]
 
     const rows = await databaseServices.orders.aggregate(pipeline).toArray()
 
     // fill missing days
-    const points: Array<{ date: string; amount: number }> = []
+    const points: Array<{ date: string; revenue: number; orders: number }> = []
     for (let d = startOfDay(start); d <= startOfDay(end); d = addDays(d, 1)) {
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
       const found = rows.find((r) => r.date === key)
-      points.push({ date: key, amount: found?.amount || 0 })
+      points.push({ date: key, revenue: found?.revenue || 0, orders: found?.orders || 0 })
     }
 
-    const total = points.reduce((s, p) => s + p.amount, 0)
-    return { range: { start: start.toISOString(), end: end.toISOString() }, total, points }
+    return points
   }
 
   async getStatsOverview(params?: { start_date?: string; end_date?: string }) {
-    const match: any = {}
-    if (params?.start_date || params?.end_date) {
-      match.created_at = {}
-      if (params?.start_date) match.created_at.$gte = new Date(params.start_date)
-      if (params?.end_date) match.created_at.$lte = new Date(params.end_date)
+    const now = new Date()
+    const todayStart = startOfDay(now)
+    const weekStart = addDays(todayStart, -7)
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const yearStart = new Date(now.getFullYear(), 0, 1)
+
+    const calculateStats = async (start: Date, end: Date) => {
+      const match: any = {
+        status: { $ne: OrderStatus.Cancelled },
+        created_at: { $gte: start, $lte: end }
+      }
+
+      const [total_revenue, total_orders, total_customers, total_products] = await Promise.all([
+        databaseServices.orders
+          .aggregate([{ $match: match }, { $group: { _id: null, revenue: { $sum: '$cost_summary.total' } } }])
+          .toArray()
+          .then((r) => r[0]?.revenue || 0),
+        databaseServices.orders.countDocuments(match),
+        databaseServices.users.countDocuments({ createdAt: { $gte: start, $lte: end } }),
+        databaseServices.products.countDocuments({
+          $or: [{ deleted_at: { $exists: false } }, { deleted_at: null }],
+          createdAt: { $gte: start, $lte: end }
+        })
+      ])
+
+      return { total_revenue, total_orders, total_customers, total_products }
     }
 
-    // Orders count by status
-    const [orderTotals, statusCounts, revenueByStatus] = await Promise.all([
-      databaseServices.orders.countDocuments(match),
-      databaseServices.orders
-        .aggregate([
-          { $match: match },
-          { $group: { _id: '$status', count: { $count: {} } } },
-          { $project: { _id: 0, status: '$_id', count: 1 } }
-        ])
-        .toArray(),
-      databaseServices.orders
-        .aggregate([
-          { $match: match },
-          { $group: { _id: '$status', amount: { $sum: '$cost_summary.total' } } },
-          { $project: { _id: 0, status: '$_id', amount: 1 } }
-        ])
-        .toArray()
+    const [today, this_week, this_month, this_year] = await Promise.all([
+      calculateStats(todayStart, now),
+      calculateStats(weekStart, now),
+      calculateStats(monthStart, now),
+      calculateStats(yearStart, now)
     ])
 
-    // Top products (by revenue & quantity) in range
-    const topProducts = await databaseServices.orders
-      .aggregate([
-        { $match: match },
-        { $unwind: '$items' },
-        {
-          $group: {
-            _id: '$items.product_id',
-            product_id: { $first: '$items.product_id' },
-            name: { $first: '$items.name' },
-            thumbnail_url: { $first: '$items.thumbnail_url' },
-            quantity: { $sum: '$items.quantity' },
-            revenue: { $sum: '$items.total' }
-          }
-        },
-        { $sort: { revenue: -1 } },
-        { $limit: 10 }
-      ])
-      .toArray()
-
-    // Recent orders (last 5)
-    const recentOrders = await databaseServices.orders
-      .find(match, {
-        projection: {
-          order_code: 1,
-          status: 1,
-          created_at: 1,
-          'cost_summary.total': 1
-        }
-      })
-      .sort({ created_at: -1 })
-      .limit(5)
-      .toArray()
-
-    // Customers baseline
-    const totalUsers = await databaseServices.users.countDocuments({})
-
-    const overview = {
-      totals: {
-        total_orders: orderTotals,
-        total_users: totalUsers,
-        total_revenue: revenueByStatus.reduce((s, r) => s + (r.amount || 0), 0)
-      },
-      status_counts: statusCounts,
-      revenue_by_status: revenueByStatus,
-      top_products: topProducts,
-      recent_orders: recentOrders.map((o) => ({
-        order_code: o.order_code,
-        status: o.status,
-        created_at: o.created_at,
-        created_at_display: o.created_at?.toLocaleString('vi-VN'),
-        total: o.cost_summary?.total || 0
-      }))
-    }
-
-    return overview
+    return { today, this_week, this_month, this_year }
   }
 
   async getAdminCustomers(params: {
@@ -601,39 +531,40 @@ class AdminService {
       const s = map[status]
       const code = `#USR-${u._id?.toString().slice(-6).toUpperCase()}`
       return {
-        id: u._id,
+        _id: u._id?.toString() || '',
+        id: u._id?.toString() || '',
         customer_code: code,
-        name: u.full_name,
+        first_name: u.full_name?.split(' ')[0] || '',
+        last_name: u.full_name?.split(' ').slice(1).join(' ') || '',
+        full_name: u.full_name || '',
+        name: u.full_name || '',
         avatar_url: u.avatar || null,
-        email: u.email,
+        email: u.email || '',
+        phonenumber: u.phonenumber || '',
         phone: u.phonenumber || '',
         type: 'registered',
+        status: status,
+        orders_count: u.order_count || 0,
         stats: {
           order_count: u.order_count || 0,
           total_spent: u.total_spent || 0,
           total_spent_display: toVn(u.total_spent || 0)
         },
-        status,
         status_label: s.label,
         status_color: s.color,
+        createdAt: u.createdAt ? u.createdAt.toISOString() : undefined,
         joined_at: u.createdAt,
         joined_at_display: u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : ''
       }
     })
 
-    const startIdx = total === 0 ? 0 : (page - 1) * limit + 1
-    const endIdx = Math.min(page * limit, total)
     return {
-      items,
-      meta: {
-        total_items: total,
-        total_pages: Math.ceil(total / limit) || 1,
-        current_page: page,
+      customers: items,
+      pagination: {
+        page,
         limit,
-        showing_text:
-          total === 0
-            ? 'Không có khách hàng nào'
-            : `Hiển thị ${startIdx}-${endIdx} trên ${new Intl.NumberFormat('vi-VN').format(total)} khách hàng`
+        total_page: Math.ceil(total / limit) || 1,
+        total
       }
     }
   }
