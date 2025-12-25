@@ -12,7 +12,6 @@ import type {
   VerifyForgotPasswordTokenRequest,
   ApiResponse,
 } from '@/types'
-import type { ApiError } from '@/types/api.types'
 
 /**
  * Login với email/username và password

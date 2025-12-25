@@ -16,6 +16,7 @@ export interface Product {
   colors?: string[]
   sizes?: string[]
   is_featured?: boolean
+  status?: 'active' | 'inactive' | 'out_of_stock' | 'low_stock' | 'draft'
   created_at?: string
   updated_at?: string
 }

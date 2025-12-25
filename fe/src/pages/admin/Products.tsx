@@ -9,7 +9,7 @@ import Pagination from '@/components/common/Pagination'
 import Modal from '@/components/common/Modal'
 import { useToast } from '@/contexts/ToastContext'
 import * as adminService from '@/services/admin.service'
-import { ROUTES, PAGINATION } from '@/utils/constants'
+import { PAGINATION } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import type { Product } from '@/types'
 
@@ -102,7 +102,9 @@ const AdminProducts = () => {
       key: 'category',
       header: 'Danh mục',
       render: (product) => (
-        <span className="text-sm">{product.category?.name || 'N/A'}</span>
+        <span className="text-sm">
+          {typeof product.category === 'object' ? product.category.name : product.category || 'N/A'}
+        </span>
       ),
     },
     {

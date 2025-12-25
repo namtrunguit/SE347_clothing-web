@@ -5,7 +5,6 @@ import Chart from '@/components/admin/Chart'
 import Skeleton from '@/components/common/Skeleton'
 import { useToast } from '@/contexts/ToastContext'
 import * as adminService from '@/services/admin.service'
-import { formatPrice } from '@/utils/formatters'
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState<adminService.DashboardStats | null>(null)

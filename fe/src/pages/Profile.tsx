@@ -135,7 +135,7 @@ const Profile = () => {
         email: data.email,
         phonenumber: data.phonenumber || undefined,
         address: data.address || undefined,
-        date_of_birth: data.date_of_birth || undefined,
+        date_of_birth: data.date_of_birth && data.date_of_birth.trim() !== '' ? data.date_of_birth : undefined,
         avatar: avatarUrl || undefined,
       }
 
