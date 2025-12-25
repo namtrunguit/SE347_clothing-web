@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { ROUTES } from '@/utils/constants'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
@@ -45,11 +46,25 @@ const Header = () => {
   }
 
   return (
-    <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2c32] px-4 md:px-10 py-4 sticky top-0 z-50">
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2c32] px-4 md:px-10 py-4 sticky top-0 z-50"
+    >
       {/* Logo */}
-      <Link to={ROUTES.HOME} className="flex items-center gap-4 text-text-main dark:text-white">
-        <div className="size-8 text-primary">
-          <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Link to={ROUTES.HOME} className="flex items-center gap-4 text-text-main dark:text-white">
+          <motion.div
+            className="size-8 text-primary"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          >
+            <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z"
               fill="currentColor"
@@ -61,56 +76,71 @@ const Header = () => {
               fillRule="evenodd"
             ></path>
           </svg>
-        </div>
-        <h2 className="text-2xl font-bold leading-tight tracking-[-0.015em] select-none">
-          YORI
-        </h2>
-      </Link>
+          </motion.div>
+          <motion.h2
+            className="text-2xl font-bold leading-tight tracking-[-0.015em] select-none"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            YORI
+          </motion.h2>
+        </Link>
+      </motion.div>
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex items-center gap-9 flex-1 justify-center">
-        <Link
-          to={ROUTES.HOME}
-          className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal"
-        >
-          Trang chủ
-        </Link>
-        <Link
-          to={ROUTES.CATEGORIES}
-          className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal"
-        >
-          Danh mục
-        </Link>
-        <Link
-          to={ROUTES.PRODUCTS}
-          className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal"
-        >
-          Sản phẩm
-        </Link>
-        <Link
-          to={ROUTES.ABOUT}
-          className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal"
-        >
-          Giới thiệu
-        </Link>
-        <Link
-          to={ROUTES.CONTACT}
-          className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal"
-        >
-          Liên hệ
-        </Link>
+        {[
+          { to: ROUTES.HOME, label: 'Trang chủ' },
+          { to: ROUTES.CATEGORIES, label: 'Danh mục' },
+          { to: ROUTES.PRODUCTS, label: 'Sản phẩm' },
+          { to: ROUTES.ABOUT, label: 'Giới thiệu' },
+          { to: ROUTES.CONTACT, label: 'Liên hệ' },
+        ].map((item, index) => (
+          <motion.div
+            key={item.to}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <Link
+              to={item.to}
+              className="text-text-main dark:text-gray-200 hover:text-primary transition-colors text-sm font-medium leading-normal relative"
+            >
+              <motion.span
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.2 }}
+                className="block"
+              >
+                {item.label}
+              </motion.span>
+              <motion.div
+                className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary"
+                whileHover={{ width: '100%' }}
+                transition={{ duration: 0.3 }}
+              />
+            </Link>
+          </motion.div>
+        ))}
       </nav>
 
       {/* Icons */}
-      <div className="flex gap-2 items-center">
+      <motion.div
+        className="flex gap-2 items-center"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
         {/* Search */}
-        <button
+        <motion.button
           onClick={() => setIsSearchOpen(!isSearchOpen)}
           className="flex items-center justify-center rounded-lg size-10 hover:bg-gray-100 dark:hover:bg-gray-700 text-text-main dark:text-gray-200 transition-colors"
           aria-label="Search"
+          whileHover={{ scale: 1.1, rotate: 15 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ duration: 0.2 }}
         >
           <span className="material-symbols-outlined">search</span>
-        </button>
+        </motion.button>
 
         {/* User Menu */}
         <div className="relative" ref={userMenuRef}>
@@ -211,7 +241,7 @@ const Header = () => {
             {isMobileMenuOpen ? 'close' : 'menu'}
           </span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Search Bar (Mobile/Desktop) */}
       {isSearchOpen && (
@@ -276,7 +306,7 @@ const Header = () => {
           </nav>
         </div>
       )}
-    </header>
+    </motion.header>
   )
 }
 

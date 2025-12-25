@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 import ProductCard from '@/components/product/ProductCard'
 import Skeleton from '@/components/common/Skeleton'
+import AnimatedSection from '@/components/common/AnimatedSection'
 import { getBanners } from '@/services/banners.service'
 import { getProducts } from '@/services/products.service'
 import { getCategories } from '@/services/categories.service'
@@ -152,7 +154,12 @@ const Home = () => {
   }, [banners.length])
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark"
+    >
       <Header />
       <main className="flex-grow">
         {/* Hero Section - Banner Carousel */}
@@ -163,11 +170,15 @@ const Home = () => {
             ) : banners.length > 0 ? (
               <div className="relative overflow-hidden rounded-xl h-[560px] bg-cover bg-center group">
                 {banners.map((banner, index) => (
-                  <div
+                  <motion.div
                     key={banner._id || banner.id || index}
-                    className={`absolute inset-0 transition-opacity duration-500 ${
-                      index === currentBannerIndex ? 'opacity-100' : 'opacity-0'
-                    }`}
+                    className="absolute inset-0"
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{
+                      opacity: index === currentBannerIndex ? 1 : 0,
+                      scale: index === currentBannerIndex ? 1 : 1.1,
+                    }}
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
                     style={{
                       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%), url("${banner.image || banner.image_url}")`,
                       backgroundSize: 'cover',
@@ -175,38 +186,76 @@ const Home = () => {
                     }}
                   >
                     <div className="absolute inset-0 flex flex-col justify-end items-start p-10 lg:p-16">
-                      <div className="flex flex-col gap-3 text-left max-w-xl">
+                      <motion.div
+                        className="flex flex-col gap-3 text-left max-w-xl"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{
+                          opacity: index === currentBannerIndex ? 1 : 0,
+                          y: index === currentBannerIndex ? 0 : 30,
+                        }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
                         {banner.title && (
-                          <h2 className="text-white text-base md:text-lg font-medium tracking-wide uppercase opacity-90">
+                          <motion.h2
+                            className="text-white text-base md:text-lg font-medium tracking-wide uppercase opacity-90"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{
+                              opacity: index === currentBannerIndex ? 0.9 : 0,
+                              x: index === currentBannerIndex ? 0 : -20,
+                            }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                          >
                             {banner.title}
-                          </h2>
+                          </motion.h2>
                         )}
-                        <h1 className="text-white text-4xl md:text-6xl font-black leading-tight tracking-[-0.033em] mb-4">
+                        <motion.h1
+                          className="text-white text-4xl md:text-6xl font-black leading-tight tracking-[-0.033em] mb-4"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{
+                            opacity: index === currentBannerIndex ? 1 : 0,
+                            y: index === currentBannerIndex ? 0 : 20,
+                          }}
+                          transition={{ duration: 0.6, delay: 0.4 }}
+                        >
                           {banner.title?.split('\n').map((line, i) => (
                             <span key={i}>
                               {line}
                               {i < banner.title!.split('\n').length - 1 && <br />}
                             </span>
                           ))}
-                        </h1>
+                        </motion.h1>
                         {banner.link && (
-                          <Link
-                            to={banner.link}
-                            className="mt-4 w-fit px-8 py-3 bg-primary hover:bg-[#159cc9] text-white rounded-lg text-base font-bold transition-all transform hover:translate-y-[-2px] hover:shadow-lg"
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{
+                              opacity: index === currentBannerIndex ? 1 : 0,
+                              y: index === currentBannerIndex ? 0 : 20,
+                            }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
                           >
-                            {banner.cta_text || 'Khám Phá Ngay'}
-                          </Link>
+                            <Link
+                              to={banner.link}
+                              className="mt-4 w-fit px-8 py-3 bg-primary hover:bg-[#159cc9] text-white rounded-lg text-base font-bold transition-all transform hover:translate-y-[-2px] hover:shadow-lg inline-block"
+                            >
+                              {banner.cta_text || 'Khám Phá Ngay'}
+                            </Link>
+                          </motion.div>
                         )}
-                      </div>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
 
                 {/* Banner Indicators */}
                 {banners.length > 1 && (
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                  <motion.div
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
                     {banners.map((_, index) => (
-                      <button
+                      <motion.button
                         key={index}
                         onClick={() => setCurrentBannerIndex(index)}
                         className={`h-2 rounded-full transition-all ${
@@ -215,9 +264,15 @@ const Home = () => {
                             : 'w-2 bg-white/50 hover:bg-white/75'
                         }`}
                         aria-label={`Go to banner ${index + 1}`}
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.9 }}
+                        animate={{
+                          width: index === currentBannerIndex ? 32 : 8,
+                        }}
+                        transition={{ duration: 0.3 }}
                       />
                     ))}
-                  </div>
+                  </motion.div>
                 )}
               </div>
             ) : (
@@ -229,34 +284,68 @@ const Home = () => {
         </div>
 
         {/* Brand Philosophy / Intro Section */}
-        <div className="w-full px-4 lg:px-40 py-16 flex justify-center bg-white dark:bg-[#1a2c32]">
-          <div className="max-w-[720px] text-center flex flex-col gap-4">
-            <span className="text-primary font-bold tracking-widest text-xs uppercase">
-              Về YORI
-            </span>
-            <h3 className="text-2xl md:text-3xl font-bold text-text-main dark:text-white leading-snug">
-              Chúng tôi tin rằng thời trang không chỉ là vẻ bề ngoài, mà là sự phản chiếu của nội tâm yên bình.
-            </h3>
-            <p className="text-text-sub dark:text-gray-400 text-base md:text-lg mt-2 font-light">
-              Mỗi thiết kế của YORI đều mang đậm triết lý tối giản của Nhật Bản, chú trọng vào chất liệu tự nhiên và sự thoải mái tuyệt đối.
-            </p>
+        <AnimatedSection delay={0.2}>
+          <div className="w-full px-4 lg:px-40 py-16 flex justify-center bg-white dark:bg-[#1a2c32]">
+            <div className="max-w-[720px] text-center flex flex-col gap-4">
+              <motion.span
+                className="text-primary font-bold tracking-widest text-xs uppercase"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                Về YORI
+              </motion.span>
+              <motion.h3
+                className="text-2xl md:text-3xl font-bold text-text-main dark:text-white leading-snug"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Chúng tôi tin rằng thời trang không chỉ là vẻ bề ngoài, mà là sự phản chiếu của nội tâm yên bình.
+              </motion.h3>
+              <motion.p
+                className="text-text-sub dark:text-gray-400 text-base md:text-lg mt-2 font-light"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                Mỗi thiết kế của YORI đều mang đậm triết lý tối giản của Nhật Bản, chú trọng vào chất liệu tự nhiên và sự thoải mái tuyệt đối.
+              </motion.p>
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
 
         {/* Featured Products Section */}
-        <div className="w-full px-4 lg:px-40 py-12 flex justify-center bg-background-light dark:bg-background-dark">
-          <div className="w-full max-w-[1200px]">
-            <div className="flex justify-between items-end mb-8 px-2">
-              <h2 className="text-text-main dark:text-white text-3xl font-bold tracking-[-0.015em]">
-                Sản phẩm nổi bật
-              </h2>
-              <Link
-                to={ROUTES.PRODUCTS}
-                className="text-text-sub hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors text-sm font-medium flex items-center gap-1"
+        <AnimatedSection delay={0.1}>
+          <div className="w-full px-4 lg:px-40 py-12 flex justify-center bg-background-light dark:bg-background-dark">
+            <div className="w-full max-w-[1200px]">
+              <motion.div
+                className="flex justify-between items-end mb-8 px-2"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
               >
-                Xem tất cả <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-            </div>
+                <h2 className="text-text-main dark:text-white text-3xl font-bold tracking-[-0.015em]">
+                  Sản phẩm nổi bật
+                </h2>
+                <Link
+                  to={ROUTES.PRODUCTS}
+                  className="text-text-sub hover:text-primary dark:text-gray-400 dark:hover:text-primary transition-colors text-sm font-medium flex items-center gap-1 group"
+                >
+                  Xem tất cả{' '}
+                  <motion.span
+                    className="material-symbols-outlined text-sm"
+                    whileHover={{ x: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    arrow_forward
+                  </motion.span>
+                </Link>
+              </motion.div>
 
             {isLoadingProducts ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -280,8 +369,8 @@ const Home = () => {
               </div>
             ) : featuredProducts.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {featuredProducts.map((product) => (
-                  <ProductCard key={product._id} product={product} />
+                {featuredProducts.map((product, index) => (
+                  <ProductCard key={product._id} product={product} index={index} />
                 ))}
               </div>
             ) : (
@@ -297,90 +386,125 @@ const Home = () => {
                 </Link>
               </div>
             )}
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
 
         {/* Categories Section */}
-        <div className="w-full px-4 lg:px-40 py-12 flex justify-center bg-gray-50 dark:bg-white/5">
-          <div className="max-w-[1200px] w-full">
-            {isLoadingCategories ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
-                <Skeleton className="w-full h-full rounded-xl" />
-                <div className="grid grid-rows-2 gap-6">
+        <AnimatedSection delay={0.2}>
+          <div className="w-full px-4 lg:px-40 py-12 flex justify-center bg-gray-50 dark:bg-white/5">
+            <div className="max-w-[1200px] w-full">
+              {isLoadingCategories ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
                   <Skeleton className="w-full h-full rounded-xl" />
-                  <Skeleton className="w-full h-full rounded-xl" />
+                  <div className="grid grid-rows-2 gap-6">
+                    <Skeleton className="w-full h-full rounded-xl" />
+                    <Skeleton className="w-full h-full rounded-xl" />
+                  </div>
                 </div>
-              </div>
-            ) : categories.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
-                {/* Large card - Đồ Len & Dệt Kim */}
-                {categories[0] && (
-                  <Link
-                    to={`${ROUTES.PRODUCTS}?category=${categories[0].slug}`}
-                    className="relative group overflow-hidden rounded-xl cursor-pointer"
-                  >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                      style={{
-                        backgroundImage: categories[0].image
-                          ? `url("${categories[0].image}")`
-                          : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6Lm7D1D1o3GUSaDSunJ2gOZxjeZ-odAMibuS7BpqAz2bNkvdaga74ni_BjQnSXRZ0qIrCQLAMu3_rXgjDkzwvFuClJvPpxxvJFVPe3ezVZFWOTD3BshXI8jIM5Tg8QYc3ETGvuzFG0Qb3UJt3Fk3p_6RtCWyuC_RgzMkkC7RjM25MN_LffPEMQHaMjQm5tonOuSgTod31DF4zAyQZClgkuQvJOgC3xa4UAJ-OTmHGFEt8k3xsiq5rmbVIAAbXioxT12bHNfYM0k0")',
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                    <div className="absolute bottom-8 left-8">
-                      <h3 className="text-white text-2xl font-bold mb-2">{categories[0].name}</h3>
-                      <span className="text-white text-sm font-medium underline underline-offset-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 duration-300 block">
-                        Xem bộ sưu tập
-                      </span>
-                    </div>
-                  </Link>
-                )}
-                {/* Two smaller cards */}
-                <div className="grid grid-rows-2 gap-6">
-                  {categories[1] && (
-                    <Link
-                      to={`${ROUTES.PRODUCTS}?category=${categories[1].slug}`}
-                      className="relative group overflow-hidden rounded-xl cursor-pointer"
+              ) : categories.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
+                  {/* Large card - Đồ Len & Dệt Kim */}
+                  {categories[0] && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
                     >
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                        style={{
-                          backgroundImage: categories[1].image
-                            ? `url("${categories[1].image}")`
-                            : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCJe-7ApiUsPoFCgiHguEHxxhqylhrdYn8sCAGcfaN3Tn5LwfGTldpUzbVtnmtCVlVPeAEIwPX2EbVqL7PZskI5jov7xrvtHUSvzTpaoUArNNhD0YYZD9FoQpIswHeEZ07BdAuPIuWqAUyOBbnIz8p59LKtLVel7zL7MyqO0kOSDCqVikgPuj-c9a76m6Pr17sO6IY1kEaUJTRcJeneNeYvsKYHFXxSoJTpfUd44c6ooVuATOvL7aDk5oXQvApCrn3Es8UKSgw2gpU")',
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                      <div className="absolute bottom-6 left-6">
-                        <h3 className="text-white text-xl font-bold">{categories[1].name}</h3>
-                      </div>
-                    </Link>
+                      <Link
+                        to={`${ROUTES.PRODUCTS}?category=${categories[0].slug}`}
+                        className="relative group overflow-hidden rounded-xl cursor-pointer block h-full"
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-cover bg-center"
+                          style={{
+                            backgroundImage: categories[0].image
+                              ? `url("${categories[0].image}")`
+                              : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6Lm7D1D1o3GUSaDSunJ2gOZxjeZ-odAMibuS7BpqAz2bNkvdaga74ni_BjQnSXRZ0qIrCQLAMu3_rXgjDkzwvFuClJvPpxxvJFVPe3ezVZFWOTD3BshXI8jIM5Tg8QYc3ETGvuzFG0Qb3UJt3Fk3p_6RtCWyuC_RgzMkkC7RjM25MN_LffPEMQHaMjQm5tonOuSgTod31DF4zAyQZClgkuQvJOgC3xa4UAJ-OTmHGFEt8k3xsiq5rmbVIAAbXioxT12bHNfYM0k0")',
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.7 }}
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                        <div className="absolute bottom-8 left-8">
+                          <h3 className="text-white text-2xl font-bold mb-2">{categories[0].name}</h3>
+                          <motion.span
+                            className="text-white text-sm font-medium underline underline-offset-4 block"
+                            initial={{ opacity: 0, y: 10 }}
+                            whileHover={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            Xem bộ sưu tập
+                          </motion.span>
+                        </div>
+                      </Link>
+                    </motion.div>
                   )}
-                  {categories[2] && (
-                    <Link
-                      to={`${ROUTES.PRODUCTS}?category=${categories[2].slug}`}
-                      className="relative group overflow-hidden rounded-xl cursor-pointer"
-                    >
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                        style={{
-                          backgroundImage: categories[2].image
-                            ? `url("${categories[2].image}")`
-                            : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDdYcL7jlW8EOdgxZe_djIC4aQRFoOhZskaFAKCdxReWiP8HtheLwXUAeEwLNKeF64i6tTzD5-Mz1YC-v4VpRakSgY8RnmYoxs97pTOZ5PZVtyCWKemk7xJ1Mfjzsti7me5wJsj3q0K6B7Fk3-W3fLSe4lqLeqPn9Fk9B4ZDzpAwkMMBmV5Bv4l8vUVNtvu-l08qnW8Vmpjlorgnr4WeAQZuHdj-gkNOWT-xDOBUzszEEMUj1gd_5KO27RQcvzOCPR3Thaz_X3IeK0")',
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                      <div className="absolute bottom-6 left-6">
-                        <h3 className="text-white text-xl font-bold">{categories[2].name}</h3>
-                      </div>
-                    </Link>
-                  )}
+                  {/* Two smaller cards */}
+                  <div className="grid grid-rows-2 gap-6">
+                    {categories[1] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <Link
+                          to={`${ROUTES.PRODUCTS}?category=${categories[1].slug}`}
+                          className="relative group overflow-hidden rounded-xl cursor-pointer block h-full"
+                        >
+                          <motion.div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{
+                              backgroundImage: categories[1].image
+                                ? `url("${categories[1].image}")`
+                                : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCJe-7ApiUsPoFCgiHguEHxxhqylhrdYn8sCAGcfaN3Tn5LwfGTldpUzbVtnmtCVlVPeAEIwPX2EbVqL7PZskI5jov7xrvtHUSvzTpaoUArNNhD0YYZD9FoQpIswHeEZ07BdAuPIuWqAUyOBbnIz8p59LKtLVel7zL7MyqO0kOSDCqVikgPuj-c9a76m6Pr17sO6IY1kEaUJTRcJeneNeYvsKYHFXxSoJTpfUd44c6ooVuATOvL7aDk5oXQvApCrn3Es8UKSgw2gpU")',
+                            }}
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.7 }}
+                          />
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                          <div className="absolute bottom-6 left-6">
+                            <h3 className="text-white text-xl font-bold">{categories[1].name}</h3>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )}
+                    {categories[2] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                      >
+                        <Link
+                          to={`${ROUTES.PRODUCTS}?category=${categories[2].slug}`}
+                          className="relative group overflow-hidden rounded-xl cursor-pointer block h-full"
+                        >
+                          <motion.div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{
+                              backgroundImage: categories[2].image
+                                ? `url("${categories[2].image}")`
+                                : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDdYcL7jlW8EOdgxZe_djIC4aQRFoOhZskaFAKCdxReWiP8HtheLwXUAeEwLNKeF64i6tTzD5-Mz1YC-v4VpRakSgY8RnmYoxs97pTOZ5PZVtyCWKemk7xJ1Mfjzsti7me5wJsj3q0K6B7Fk3-W3fLSe4lqLeqPn9Fk9B4ZDzpAwkMMBmV5Bv4l8vUVNtvu-l08qnW8Vmpjlorgnr4WeAQZuHdj-gkNOWT-xDOBUzszEEMUj1gd_5KO27RQcvzOCPR3Thaz_X3IeK0")',
+                            }}
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.7 }}
+                          />
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                          <div className="absolute bottom-6 left-6">
+                            <h3 className="text-white text-xl font-bold">{categories[2].name}</h3>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )}
                 </div>
               </div>
             ) : null}
+            </div>
           </div>
-        </div>
+        </AnimatedSection>
 
         {/* Best Sellers Section */}
         <div className="w-full px-4 lg:px-40 py-16 flex justify-center bg-background-light dark:bg-background-dark">
@@ -477,7 +601,7 @@ const Home = () => {
         </div>
       </main>
       <Footer />
-    </div>
+    </motion.div>
   )
 }
 

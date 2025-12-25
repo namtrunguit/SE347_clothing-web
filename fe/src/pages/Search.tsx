@@ -225,8 +225,8 @@ const Search = () => {
                 {products.length > 0 ? (
                   <>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-                      {products.map((product) => (
-                        <ProductCard key={product._id} product={product} />
+                      {products.map((product, index) => (
+                        <ProductCard key={product._id} product={product} index={index} />
                       ))}
                     </div>
 

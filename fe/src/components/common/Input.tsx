@@ -53,8 +53,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               text-text-main dark:text-white
               focus:ring-2 focus:ring-primary focus:border-transparent
               outline-none
-              transition-all
+              transition-all duration-300
               text-sm
+              hover:border-primary/50
+              focus:scale-[1.01]
               ${className}
             `}
             {...props}
