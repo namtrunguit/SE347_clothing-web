@@ -17,6 +17,7 @@ interface UserType {
   address?: string
   avatar?: string
   phonenumber?: string
+  date_of_birth?: Date
 }
 
 export default class User {
@@ -35,6 +36,7 @@ export default class User {
   address: string
   avatar: string
   phonenumber: string
+  date_of_birth?: Date
 
   constructor(user: UserType) {
     this._id = user._id || new ObjectId()
@@ -52,5 +54,6 @@ export default class User {
     this.address = user.address || ''
     this.avatar = user.avatar || ''
     this.phonenumber = user.phonenumber || ''
+    this.date_of_birth = user.date_of_birth
   }
 }

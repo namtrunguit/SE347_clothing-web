@@ -42,6 +42,7 @@ export default class Order {
   shipping_info: ShippingInfo
   items: OrderItem[]
   cost_summary: CostSummary
+  note?: string
   created_at?: Date
   updated_at?: Date
 
@@ -52,6 +53,7 @@ export default class Order {
     shipping_info: ShippingInfo
     items: OrderItem[]
     cost_summary: CostSummary
+    note?: string
     created_at?: Date
     updated_at?: Date
     _id?: ObjectId
@@ -63,6 +65,7 @@ export default class Order {
     this.shipping_info = order.shipping_info
     this.items = order.items
     this.cost_summary = order.cost_summary
+    this.note = order.note
     this.created_at = order.created_at || new Date()
     this.updated_at = order.updated_at || new Date()
   }

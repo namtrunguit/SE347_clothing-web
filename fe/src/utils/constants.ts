@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/users/login',
     REGISTER: '/users/register',
     LOGOUT: '/users/logout',
+    REFRESH_TOKEN: '/users/refresh-token',
     SOCIAL_LOGIN: '/users/social-login',
     FORGOT_PASSWORD: '/users/forgot-password',
     RESET_PASSWORD: '/users/reset-password',

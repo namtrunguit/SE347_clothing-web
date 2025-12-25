@@ -4,34 +4,33 @@ import { ErrorWithStatus, EntityError } from '~/models/Errors'
 import { omit } from 'lodash'
 
 export const defaultErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof ErrorWithStatus) {
-    if (err instanceof EntityError) {
-      const errors: Record<string, string[]> = {}
-      for (const key in err.error) {
-        errors[key] = [err.error[key].msg]
-      }
-      return res.status(err.status).json({
-        status: err.status,
-        message: err.message,
-        errors
+  // EntityError - Validation errors (422)
+  if (err instanceof EntityError) {
+    const errors: Array<{ field: string; message: string }> = []
+    for (const key in err.error) {
+      errors.push({
+        field: key,
+        message: err.error[key].msg
       })
     }
     return res.status(err.status).json({
-      status: err.status,
       message: err.message,
-      ...omit(err, ['status', 'message'])
+      errors
     })
   }
-  Object.getOwnPropertyNames(err).forEach((key) => {
-    Object.defineProperties(err, {
-      key: {
-        enumerable: true
-      }
+
+  // ErrorWithStatus - Other errors (400, 401, 403, 404, etc.)
+  if (err instanceof ErrorWithStatus) {
+    return res.status(err.status).json({
+      message: err.message
     })
-  })
+  }
+
+  // Unknown errors - Internal Server Error (500)
+  // Log error for debugging (không expose stack trace trong production)
+  console.error('Unhandled error:', err)
+  
   return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-    status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    message: err.message || 'Internal Server Error',
-    errorInfo: omit(err, 'stack')
+    message: err.message || 'Internal Server Error'
   })
 }

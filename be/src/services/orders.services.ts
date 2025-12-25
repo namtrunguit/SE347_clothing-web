@@ -47,7 +47,8 @@ class OrdersService {
         shipping_fee,
         discount_amount,
         total
-      }
+      },
+      note: body.note
     })
 
     const result = await databaseServices.orders.insertOne(order)
@@ -59,7 +60,7 @@ class OrdersService {
     )
 
     return {
-      order_id: result.insertedId,
+      order_id: result.insertedId.toString(),
       order_code
     }
   }
@@ -105,16 +106,40 @@ class OrdersService {
     const total = await databaseServices.orders.countDocuments(match)
 
     const items = orders.map((order) => ({
-      id: order._id,
+      _id: order._id?.toString(),
+      id: order._id?.toString(), // Keep for backward compatibility
+      user_id: order.user_id?.toString() || '',
       order_code: order.order_code,
-      created_at: order.created_at,
-      created_at_display: order.created_at ? order.created_at.toLocaleDateString('vi-VN') : '',
-      product_summary: order.items.map((item) => item.name).join(', '),
-      total_amount: order.cost_summary.total,
-      total_display: `${order.cost_summary.total.toLocaleString('vi-VN')}đ`,
       status: order.status,
-      status_label: this.getStatusLabel(order.status),
-      detail_link: `/account/orders/${order.order_code}`
+      created_at: order.created_at ? order.created_at.toISOString() : undefined,
+      updated_at: order.updated_at ? order.updated_at.toISOString() : undefined,
+      note: order.note || undefined,
+      items: order.items.map((item) => ({
+        product_id: item.product_id?.toString() || '',
+        name: item.name,
+        thumbnail_url: item.thumbnail_url,
+        variant_text: item.variant_text || '',
+        price: item.price,
+        quantity: item.quantity,
+        total: item.total
+      })),
+      shipping_info: {
+        receiver_name: order.shipping_info.receiver_name,
+        phone: order.shipping_info.phone,
+        email: order.shipping_info.email || '',
+        address: order.shipping_info.address,
+        province_id: order.shipping_info.province_id || undefined,
+        district_id: order.shipping_info.district_id || undefined,
+        ward_id: order.shipping_info.ward_id || undefined,
+        payment_method: order.shipping_info.payment_method,
+        estimated_delivery: order.shipping_info.estimated_delivery || undefined
+      },
+      cost_summary: {
+        subtotal: order.cost_summary.subtotal,
+        shipping_fee: order.cost_summary.shipping_fee,
+        discount_amount: order.cost_summary.discount_amount,
+        total: order.cost_summary.total
+      }
     }))
 
     return {
@@ -142,43 +167,40 @@ class OrdersService {
     if (!order) return null
 
     return {
-      id: order._id,
+      _id: order._id?.toString(),
+      id: order._id?.toString(), // Keep for backward compatibility
+      user_id: order.user_id?.toString() || '',
       order_code: order.order_code,
-      created_at: order.created_at,
-      created_at_display: order.created_at ? order.created_at.toLocaleString('vi-VN') : '',
-      current_status: order.status,
-      status_label: this.getStatusLabel(order.status),
-      status_color: this.getStatusColor(order.status),
-      timeline: this.getTimeline(order.status, order.created_at),
+      status: order.status,
+      created_at: order.created_at ? order.created_at.toISOString() : undefined,
+      updated_at: order.updated_at ? order.updated_at.toISOString() : undefined,
+      note: order.note || undefined,
       items: order.items.map((item) => ({
-        id: item.product_id, // Using product_id as item id for now
-        product_id: item.product_id,
+        product_id: item.product_id?.toString() || '',
         name: item.name,
         thumbnail_url: item.thumbnail_url,
-        variant_text: item.variant_text,
+        variant_text: item.variant_text || '',
         price: item.price,
-        price_display: `${item.price.toLocaleString('vi-VN')}đ`,
         quantity: item.quantity,
-        total_display: `${item.total.toLocaleString('vi-VN')}đ`,
-        can_review: order.status === OrderStatus.Completed,
-        is_reviewed: false
+        total: item.total
       })),
-      summary: {
-        subtotal: order.cost_summary.subtotal,
-        subtotal_display: `${order.cost_summary.subtotal.toLocaleString('vi-VN')}đ`,
-        shipping_fee: order.cost_summary.shipping_fee,
-        shipping_display: `${order.cost_summary.shipping_fee.toLocaleString('vi-VN')}đ`,
-        discount_amount: order.cost_summary.discount_amount,
-        discount_display: `-${order.cost_summary.discount_amount.toLocaleString('vi-VN')}đ`,
-        total: order.cost_summary.total,
-        total_display: `${order.cost_summary.total.toLocaleString('vi-VN')}đ`
-      },
-      shipping_address: {
+      shipping_info: {
         receiver_name: order.shipping_info.receiver_name,
         phone: order.shipping_info.phone,
-        full_address: order.shipping_info.address
+        email: order.shipping_info.email || '',
+        address: order.shipping_info.address,
+        province_id: order.shipping_info.province_id || undefined,
+        district_id: order.shipping_info.district_id || undefined,
+        ward_id: order.shipping_info.ward_id || undefined,
+        payment_method: order.shipping_info.payment_method,
+        estimated_delivery: order.shipping_info.estimated_delivery || undefined
       },
-      payment_method: order.shipping_info.payment_method
+      cost_summary: {
+        subtotal: order.cost_summary.subtotal,
+        shipping_fee: order.cost_summary.shipping_fee,
+        discount_amount: order.cost_summary.discount_amount,
+        total: order.cost_summary.total
+      }
     }
   }
 

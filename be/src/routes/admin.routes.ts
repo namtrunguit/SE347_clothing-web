@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import { accessTokenValidator } from '~/middlewares/users.middleware'
-import { requireAdmin } from '~/middlewares/admin.middleware'
+import {
+  requireAdmin,
+  updateProductValidator,
+  updateCustomerStatusValidator,
+  updateSettingsGeneralValidator
+} from '~/middlewares/admin.middleware'
 import {
   dashboardStatsController,
   revenueChartController,
@@ -89,7 +94,13 @@ adminRouter.get(
  * Path: /products/:id
  * Method: PUT
  */
-adminRouter.put('/products/:id', accessTokenValidator, requireAdmin, wrapRequestHandler(adminUpdateProductController))
+adminRouter.put(
+  '/products/:id',
+  accessTokenValidator,
+  requireAdmin,
+  updateProductValidator,
+  wrapRequestHandler(adminUpdateProductController)
+)
 
 /**
  * Description: Admin - Delete product (soft delete)
@@ -157,6 +168,7 @@ adminRouter.put(
   '/customers/:id/status',
   accessTokenValidator,
   requireAdmin,
+  updateCustomerStatusValidator,
   wrapRequestHandler(adminUpdateCustomerStatusController)
 )
 
@@ -166,6 +178,7 @@ adminRouter.put(
   '/settings/general',
   accessTokenValidator,
   requireAdmin,
+  updateSettingsGeneralValidator,
   wrapRequestHandler(adminUpdateSettingsGeneralController)
 )
 adminRouter.post(

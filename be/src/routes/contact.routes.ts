@@ -1,28 +1,48 @@
 import { Router } from 'express'
-import { body } from 'express-validator'
+import { checkSchema } from 'express-validator'
 import { submitContactController } from '~/controllers/contact.controller'
 import { validate } from '~/utils/validation'
+import { wrapRequestHandler } from '~/utils/handler'
 
 const contactRouter = Router()
 
 contactRouter.post(
   '/submit',
   validate(
-    body().custom((value, { req }) => {
-      const { name, email, message } = req.body
-      if (!name || typeof name !== 'string' || !name.trim()) {
-        throw new Error('Tên là bắt buộc')
-      }
-      if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        throw new Error('Email không hợp lệ')
-      }
-      if (!message || typeof message !== 'string' || !message.trim()) {
-        throw new Error('Nội dung là bắt buộc')
-      }
-      return true
-    })
+    checkSchema(
+      {
+        name: {
+          in: ['body'],
+          isString: { errorMessage: 'Name is required' },
+          notEmpty: { errorMessage: 'Name is required' },
+          trim: true
+        },
+        email: {
+          in: ['body'],
+          isEmail: { errorMessage: 'Valid email is required' },
+          normalizeEmail: true
+        },
+        phone: {
+          in: ['body'],
+          optional: true,
+          isString: { errorMessage: 'Phone must be a string' }
+        },
+        subject: {
+          in: ['body'],
+          optional: true,
+          isString: { errorMessage: 'Subject must be a string' }
+        },
+        message: {
+          in: ['body'],
+          isString: { errorMessage: 'Message is required' },
+          notEmpty: { errorMessage: 'Message is required' },
+          trim: true
+        }
+      },
+      ['body']
+    )
   ),
-  submitContactController
+  wrapRequestHandler(submitContactController)
 )
 
 export default contactRouter

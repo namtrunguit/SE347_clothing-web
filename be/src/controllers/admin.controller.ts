@@ -120,7 +120,10 @@ export const adminUpdateCustomerStatusController = async (req: Request, res: Res
 // ========== SETTINGS ==========
 export const adminGetSettingsController = async (_req: Request, res: Response) => {
   const result = await adminService.getAdminSettings()
-  return res.json(result)
+  return res.json({
+    message: 'Get settings successfully',
+    data: result
+  })
 }
 
 export const adminUpdateSettingsGeneralController = async (req: Request, res: Response) => {

@@ -37,10 +37,10 @@ export interface Ward {
  */
 export const getProvinces = async (): Promise<Province[]> => {
   try {
-    const response = await api.get<ApiResponse<{ result: Province[] }>>(
+    const response = await api.get<ApiResponse<Province[]>>(
       API_ENDPOINTS.LOCATIONS.PROVINCES
     )
-    return response.data.data?.result || []
+    return response.data.data || []
   } catch (error: any) {
     throw error
   }
@@ -52,10 +52,10 @@ export const getProvinces = async (): Promise<Province[]> => {
  */
 export const getDistricts = async (provinceId: string): Promise<District[]> => {
   try {
-    const response = await api.get<ApiResponse<{ result: District[] }>>(
+    const response = await api.get<ApiResponse<District[]>>(
       API_ENDPOINTS.LOCATIONS.DISTRICTS(provinceId)
     )
-    return response.data.data?.result || []
+    return response.data.data || []
   } catch (error: any) {
     throw error
   }
@@ -67,10 +67,10 @@ export const getDistricts = async (provinceId: string): Promise<District[]> => {
  */
 export const getWards = async (districtId: string): Promise<Ward[]> => {
   try {
-    const response = await api.get<ApiResponse<{ result: Ward[] }>>(
+    const response = await api.get<ApiResponse<Ward[]>>(
       API_ENDPOINTS.LOCATIONS.WARDS(districtId)
     )
-    return response.data.data?.result || []
+    return response.data.data || []
   } catch (error: any) {
     throw error
   }

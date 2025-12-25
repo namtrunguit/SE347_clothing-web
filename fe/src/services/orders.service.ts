@@ -10,8 +10,8 @@ export interface GetOrdersResponse {
   pagination: {
     page: number
     limit: number
-    total_pages: number
-    total_records: number
+    total_page: number
+    total: number
   }
 }
 

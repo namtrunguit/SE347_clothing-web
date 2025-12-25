@@ -55,14 +55,14 @@ export const registerValidator = validate(
       first_name: {
         in: ['body'],
         trim: true,
-        isString: { errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING },
-        notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_IS_REQUIRED }
+        isString: { errorMessage: 'First name must be a string' },
+        notEmpty: { errorMessage: 'First name is required' }
       },
       last_name: {
         in: ['body'],
         trim: true,
-        isString: { errorMessage: USERS_MESSAGES.USERNAME_MUST_BE_STRING },
-        notEmpty: { errorMessage: USERS_MESSAGES.USERNAME_IS_REQUIRED }
+        isString: { errorMessage: 'Last name must be a string' },
+        notEmpty: { errorMessage: 'Last name is required' }
       },
       email: {
         in: ['body'],
@@ -80,13 +80,17 @@ export const registerValidator = validate(
       },
       password: {
         in: ['body'],
+        isString: { errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRING },
         isLength: {
           options: { min: 6 },
           errorMessage: USERS_MESSAGES.PASSWORD_MIN_LENGTH
-        }
+        },
+        notEmpty: { errorMessage: 'Password is required' }
       },
       password_confirmation: {
         in: ['body'],
+        isString: { errorMessage: 'Password confirmation must be a string' },
+        notEmpty: { errorMessage: 'Password confirmation is required' },
         custom: {
           options: (value, { req }) => value === req.body.password,
           errorMessage: USERS_MESSAGES.PASSWORDS_NOT_MATCH
@@ -94,10 +98,11 @@ export const registerValidator = validate(
       },
       agree_terms: {
         in: ['body'],
-        isBoolean: { errorMessage: 'Agree terms must be boolean' },
         custom: {
           options: (value) => {
-            if (value !== true) {
+            // Accept boolean true or string "true"
+            const isAgreed = value === true || value === 'true' || value === 1
+            if (!isAgreed) {
               throw new Error('You must agree to the terms and conditions')
             }
             return true

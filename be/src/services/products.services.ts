@@ -66,19 +66,69 @@ class ProductsService {
       databaseServices.products.countDocuments(filter)
     ])
 
+    // Populate category info for each product
+    const categoryIds = Array.from(
+      new Set(products.map((p) => (p.category ? p.category.toString() : undefined)).filter((v): v is string => Boolean(v)))
+    ).map((id) => new ObjectId(id))
+
+    const categories = categoryIds.length
+      ? await databaseServices.categories
+          .find({ _id: { $in: categoryIds } })
+          .toArray()
+      : []
+
+    const catMap = new Map(categories.map((c) => [c._id?.toString(), c]))
+
+    // Map products with category info
+    const mappedProducts = products.map((p) => {
+      const category = p.category ? catMap.get(p.category.toString()) : null
+      return {
+        ...p,
+        _id: p._id?.toString(), // Ensure _id is string
+        category: category
+          ? {
+              _id: category._id?.toString(),
+              name: category.name,
+              slug: category.slug,
+              image: category.image
+            }
+          : null
+      }
+    })
+
     return {
-      products,
+      products: mappedProducts,
       pagination: {
         page,
         limit,
-        total_page: Math.ceil(total / limit)
+        total_page: Math.ceil(total / limit),
+        total
       }
     }
   }
 
   async getProductDetail(slug: string) {
     const product = await databaseServices.products.findOne({ slug })
-    return product
+    if (!product) return null
+
+    // Populate category info
+    const category = product.category
+      ? await databaseServices.categories.findOne({ _id: product.category })
+      : null
+
+    return {
+      ...product,
+      _id: product._id?.toString(), // Ensure _id is string
+      category: category
+        ? {
+            _id: category._id?.toString(),
+            name: category.name,
+            slug: category.slug,
+            image: category.image,
+            description: category.description
+          }
+        : null
+    }
   }
 
   async getRelatedProducts(slug: string, limit: number = 4) {
@@ -93,7 +143,29 @@ class ProductsService {
       .limit(limit)
       .toArray()
 
-    return relatedProducts
+    // Populate category info for related products
+    if (relatedProducts.length > 0 && product.category) {
+      const category = await databaseServices.categories.findOne({ _id: product.category })
+      const categoryInfo = category
+        ? {
+            _id: category._id?.toString(),
+            name: category.name,
+            slug: category.slug,
+            image: category.image
+          }
+        : null
+
+      return relatedProducts.map((p) => ({
+        ...p,
+        _id: p._id?.toString(), // Ensure _id is string
+        category: categoryInfo
+      }))
+    }
+
+    return relatedProducts.map((p) => ({
+      ...p,
+      _id: p._id?.toString() // Ensure _id is string
+    }))
   }
 }
 

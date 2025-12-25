@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import Breadcrumb from '@/components/common/Breadcrumb'
+import AdminLayout from '@/components/admin/AdminLayout'
 import Button from '@/components/common/Button'
 import Input from '@/components/common/Input'
 import FileUpload from '@/components/admin/FileUpload'
@@ -129,30 +127,18 @@ const AdminSettings = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-        <Header />
-        <main className="flex-grow flex items-center justify-center">
+      <AdminLayout>
+        <div className="flex items-center justify-center h-full">
           <Spinner size="lg" />
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </AdminLayout>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <Breadcrumb
-            items={[
-              { label: 'Trang chủ', to: ROUTES.HOME },
-              { label: 'Admin', to: ROUTES.ADMIN_DASHBOARD },
-              { label: 'Cài đặt', to: ROUTES.ADMIN_SETTINGS },
-            ]}
-          />
-
-          <div className="mt-8">
+    <AdminLayout>
+      <div className="max-w-[1600px] mx-auto w-full">
+        <div className="mb-8">
             <h1 className="text-3xl font-bold text-text-main dark:text-white mb-6">Cài đặt hệ thống</h1>
 
             {/* Tabs */}
@@ -276,9 +262,7 @@ const AdminSettings = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </AdminLayout>
   )
 }
 

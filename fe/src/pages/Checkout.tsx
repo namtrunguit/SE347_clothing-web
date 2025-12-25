@@ -51,6 +51,7 @@ const Checkout = () => {
     formState: { errors },
     setValue,
     watch,
+    control,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -252,6 +253,7 @@ const Checkout = () => {
                     errors={errors}
                     setValue={setValue}
                     watch={watch}
+                    control={control}
                     disabled={submitting}
                   />
                 </section>

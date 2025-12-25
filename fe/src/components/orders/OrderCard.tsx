@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { formatPrice } from '@/utils/formatters'
 import { ROUTES } from '@/utils/constants'
-import type { Order, OrderStatus } from '@/types'
+import { OrderStatus, type Order } from '@/types'
 
 interface OrderCardProps {
   order: Order

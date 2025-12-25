@@ -36,9 +36,9 @@ export interface CartResponse {
  */
 export const getCart = async (): Promise<CartResponse> => {
   try {
-    const response = await api.get<ApiResponse<{ result: CartResponse }>>(API_ENDPOINTS.CART.GET)
-    // Backend trả về trong result field
-    return response.data.data?.result || { items: [] }
+    const response = await api.get<ApiResponse<CartResponse>>(API_ENDPOINTS.CART.GET)
+    // Backend trả về trực tiếp trong data field (đã standardize)
+    return response.data.data || { items: [] }
   } catch (error: any) {
     throw error
   }

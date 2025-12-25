@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import Breadcrumb from '@/components/common/Breadcrumb'
+import AdminLayout from '@/components/admin/AdminLayout'
 import DataTable, { Column } from '@/components/admin/DataTable'
 import Button from '@/components/common/Button'
 import Input from '@/components/common/Input'
@@ -157,19 +155,9 @@ const AdminCustomers = () => {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <Breadcrumb
-            items={[
-              { label: 'Trang chủ', to: ROUTES.HOME },
-              { label: 'Admin', to: ROUTES.ADMIN_DASHBOARD },
-              { label: 'Khách hàng', to: ROUTES.ADMIN_CUSTOMERS },
-            ]}
-          />
-
-          <div className="mt-8">
+    <AdminLayout>
+      <div className="max-w-[1600px] mx-auto w-full">
+        <div className="mb-8">
             <h1 className="text-3xl font-bold text-text-main dark:text-white mb-6">
               Quản lý khách hàng
             </h1>
@@ -231,10 +219,8 @@ const AdminCustomers = () => {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
 
-      {/* Status Update Modal */}
+        {/* Status Update Modal */}
       <Modal
         isOpen={statusModalOpen}
         onClose={() => {
@@ -265,7 +251,7 @@ const AdminCustomers = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </AdminLayout>
   )
 }
 

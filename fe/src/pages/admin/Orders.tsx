@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import Breadcrumb from '@/components/common/Breadcrumb'
+import AdminLayout from '@/components/admin/AdminLayout'
 import DataTable, { Column } from '@/components/admin/DataTable'
 import StatsCard from '@/components/admin/StatsCard'
 import Button from '@/components/common/Button'
@@ -13,7 +11,7 @@ import { useToast } from '@/contexts/ToastContext'
 import * as adminService from '@/services/admin.service'
 import { ROUTES, PAGINATION } from '@/utils/constants'
 import { formatPrice, formatDate } from '@/utils/formatters'
-import type { Order, OrderStatus } from '@/types'
+import { OrderStatus, type Order } from '@/types'
 
 const AdminOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -155,22 +153,12 @@ const AdminOrders = () => {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <Breadcrumb
-            items={[
-              { label: 'Trang chủ', to: ROUTES.HOME },
-              { label: 'Admin', to: ROUTES.ADMIN_DASHBOARD },
-              { label: 'Đơn hàng', to: ROUTES.ADMIN_ORDERS },
-            ]}
-          />
-
-          <div className="mt-8">
-            <h1 className="text-3xl font-bold text-text-main dark:text-white mb-6">
-              Quản lý đơn hàng
-            </h1>
+    <AdminLayout>
+      <div className="max-w-[1600px] mx-auto w-full">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-text-main dark:text-white mb-6">
+            Quản lý đơn hàng
+          </h1>
 
             {/* Stats Cards */}
             {orderStats && (
@@ -286,9 +274,7 @@ const AdminOrders = () => {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </AdminLayout>
   )
 }
 

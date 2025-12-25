@@ -12,8 +12,8 @@ class CartService {
       _id: new ObjectId(),
       product_id,
       buy_count: body.buy_count,
-      color: body.color,
-      size: body.size
+      color: body.color && body.color.trim() ? body.color.trim() : undefined,
+      size: body.size && body.size.trim() ? body.size.trim() : undefined
     }
 
     if (!cart) {
@@ -24,9 +24,14 @@ class CartService {
         })
       )
     } else {
-      // Check if item exists
+      // Check if item exists (normalize color/size for comparison)
+      const normalizedColor = body.color && body.color.trim() ? body.color.trim() : undefined
+      const normalizedSize = body.size && body.size.trim() ? body.size.trim() : undefined
       const existItemIndex = cart.items.findIndex(
-        (item) => item.product_id.equals(product_id) && item.color === body.color && item.size === body.size
+        (item) => 
+          item.product_id.equals(product_id) && 
+          (item.color || undefined) === normalizedColor && 
+          (item.size || undefined) === normalizedSize
       )
 
       if (existItemIndex !== -1) {
@@ -49,7 +54,8 @@ class CartService {
         )
       }
     }
-    return { message: 'Add to cart successfully' }
+    // Return updated cart
+    return this.getCart(user_id)
   }
 
   async getCart(user_id: string) {
@@ -78,7 +84,12 @@ class CartService {
                 color: '$items.color',
                 size: '$items.size',
                 product_name: '$product_info.name',
-                product_image: { $arrayElemAt: ['$product_info.images', 0] },
+                product_image: {
+                  $ifNull: [
+                    { $arrayElemAt: ['$product_info.images', 0] },
+                    '$product_info.image'
+                  ]
+                },
                 price: '$product_info.price',
                 price_before_discount: '$product_info.price_before_discount',
                 slug: '$product_info.slug'
@@ -96,7 +107,19 @@ class CartService {
       return { ...result[0], items: [] }
     }
 
-    return result[0]
+    // Convert ObjectId to string for response
+    const cart = result[0]
+    return {
+      _id: cart._id?.toString(),
+      user_id: cart.user_id?.toString(),
+      items: cart.items.map((item: any) => ({
+        ...item,
+        _id: item._id?.toString(),
+        product_id: item.product_id?.toString()
+      })),
+      created_at: cart.created_at,
+      updated_at: cart.updated_at
+    }
   }
 
   async updateCartItem(user_id: string, item_id: string, buy_count: number) {
@@ -109,7 +132,8 @@ class CartService {
         }
       }
     )
-    return { message: 'Update cart item successfully' }
+    // Return updated cart
+    return this.getCart(user_id)
   }
 
   async deleteCartItem(user_id: string, item_id: string) {
@@ -120,7 +144,8 @@ class CartService {
         $set: { updated_at: new Date() }
       }
     )
-    return { message: 'Delete cart item successfully' }
+    // Return updated cart
+    return this.getCart(user_id)
   }
 }
 

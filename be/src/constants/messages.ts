@@ -25,5 +25,10 @@ export const USERS_MESSAGES = {
   VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token success',
   SOCIAL_LOGIN_SUCCESS: 'Social login success',
   PROVIDER_IS_REQUIRED: 'Provider is required',
-  TOKEN_IS_REQUIRED: 'Token is required'
+  TOKEN_IS_REQUIRED: 'Token is required',
+  USER_NOT_FOUND: 'User not found',
+  EMAIL_ALREADY_EXISTS: 'Email already exists',
+  GET_USER_SUCCESS: 'Get user success',
+  UPDATE_USER_SUCCESS: 'Update user success',
+  UPLOAD_AVATAR_SUCCESS: 'Upload avatar success'
 } as const

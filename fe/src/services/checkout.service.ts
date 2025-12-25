@@ -144,11 +144,11 @@ export const placeOrder = async (data: PlaceOrderRequest): Promise<PlaceOrderRes
       email: data.email,
     }
 
-    const response = await api.post<ApiResponse<{ result: PlaceOrderResponse }>>(
+    const response = await api.post<ApiResponse<PlaceOrderResponse>>(
       API_ENDPOINTS.CHECKOUT.PLACE_ORDER,
       requestBody
     )
-    return response.data.data?.result || response.data.data
+    return response.data.data
   } catch (error: any) {
     throw error
   }

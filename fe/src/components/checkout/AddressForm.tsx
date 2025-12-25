@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form'
+import { UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch, Control, Controller } from 'react-hook-form'
 import Select from '@/components/common/Select'
 import Input from '@/components/common/Input'
 import * as locationsService from '@/services/locations.service'
@@ -21,10 +21,11 @@ interface AddressFormProps {
   errors: FieldErrors<AddressFormData>
   setValue: UseFormSetValue<AddressFormData>
   watch: UseFormWatch<AddressFormData>
+  control: Control<AddressFormData>
   disabled?: boolean
 }
 
-const AddressForm = ({ register, errors, setValue, watch, disabled = false }: AddressFormProps) => {
+const AddressForm = ({ register, errors, setValue, watch, control, disabled = false }: AddressFormProps) => {
   const [provinces, setProvinces] = useState<Province[]>([])
   const [districts, setDistricts] = useState<District[]>([])
   const [wards, setWards] = useState<Ward[]>([])
@@ -41,6 +42,7 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
       setLoadingProvinces(true)
       try {
         const data = await locationsService.getProvinces()
+        console.log('Provinces fetched:', data)
         setProvinces(data)
       } catch (error) {
         console.error('Failed to fetch provinces:', error)
@@ -53,7 +55,8 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
 
   // Fetch districts when province changes
   useEffect(() => {
-    if (!provinceId) {
+    console.log('Province ID changed:', provinceId, 'Type:', typeof provinceId)
+    if (!provinceId || provinceId === '') {
       setDistricts([])
       setWards([])
       setValue('district_id', '')
@@ -64,7 +67,9 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
     const fetchDistricts = async () => {
       setLoadingDistricts(true)
       try {
+        console.log('Fetching districts for province:', provinceId)
         const data = await locationsService.getDistricts(provinceId)
+        console.log('Districts fetched:', data)
         setDistricts(data)
         // Reset district and ward when province changes
         setValue('district_id', '')
@@ -81,7 +86,8 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
 
   // Fetch wards when district changes
   useEffect(() => {
-    if (!districtId) {
+    console.log('District ID changed:', districtId, 'Type:', typeof districtId)
+    if (!districtId || districtId === '') {
       setWards([])
       setValue('ward_id', '')
       return
@@ -90,7 +96,9 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
     const fetchWards = async () => {
       setLoadingWards(true)
       try {
+        console.log('Fetching wards for district:', districtId)
         const data = await locationsService.getWards(districtId)
+        console.log('Wards fetched:', data)
         setWards(data)
         // Reset ward when district changes
         setValue('ward_id', '')
@@ -140,20 +148,32 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
       {/* Province, District, Ward */}
       <div className="grid gap-4 md:grid-cols-3">
         <div>
-          <Select
-            label="Tỉnh / Thành phố"
-            {...register('province_id')}
-            error={errors.province_id?.message}
-            disabled={disabled || loadingProvinces}
-            required
-          >
-            <option value="">Chọn Tỉnh/Thành</option>
-            {provinces.map((province) => (
-              <option key={province.id} value={province.id}>
-                {province.name}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="province_id"
+            control={control}
+            render={({ field: { onChange, value, onBlur, name, ref } }) => (
+              <Select
+                label="Tỉnh / Thành phố"
+                name={name}
+                ref={ref}
+                value={value || ''}
+                onChange={(e) => {
+                  const selectedValue = e.target.value
+                  console.log('🔵 Province onChange triggered:', selectedValue, 'Event:', e)
+                  onChange(e) // Pass the event directly to Controller
+                }}
+                onBlur={onBlur}
+                error={errors.province_id?.message}
+                disabled={disabled || loadingProvinces}
+                required
+                placeholder="Chọn Tỉnh/Thành"
+                options={provinces.map((province) => ({
+                  value: province.id,
+                  label: province.name
+                }))}
+              />
+            )}
+          />
           {loadingProvinces && (
             <div className="mt-2 flex items-center gap-2 text-sm text-text-sub">
               <Spinner size="sm" />
@@ -163,20 +183,32 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
         </div>
 
         <div>
-          <Select
-            label="Quận / Huyện"
-            {...register('district_id')}
-            error={errors.district_id?.message}
-            disabled={disabled || !provinceId || loadingDistricts}
-            required
-          >
-            <option value="">Chọn Quận/Huyện</option>
-            {districts.map((district) => (
-              <option key={district.id} value={district.id}>
-                {district.name}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="district_id"
+            control={control}
+            render={({ field: { onChange, value, onBlur, name, ref } }) => (
+              <Select
+                label="Quận / Huyện"
+                name={name}
+                ref={ref}
+                value={value || ''}
+                onChange={(e) => {
+                  const selectedValue = e.target.value
+                  console.log('🟢 District onChange triggered:', selectedValue, 'Event:', e)
+                  onChange(e) // Pass the event directly to Controller
+                }}
+                onBlur={onBlur}
+                error={errors.district_id?.message}
+                disabled={disabled || !provinceId || loadingDistricts}
+                required
+                placeholder="Chọn Quận/Huyện"
+                options={districts.map((district) => ({
+                  value: district.id,
+                  label: district.name
+                }))}
+              />
+            )}
+          />
           {loadingDistricts && (
             <div className="mt-2 flex items-center gap-2 text-sm text-text-sub">
               <Spinner size="sm" />
@@ -186,20 +218,32 @@ const AddressForm = ({ register, errors, setValue, watch, disabled = false }: Ad
         </div>
 
         <div>
-          <Select
-            label="Phường / Xã"
-            {...register('ward_id')}
-            error={errors.ward_id?.message}
-            disabled={disabled || !districtId || loadingWards}
-            required
-          >
-            <option value="">Chọn Phường/Xã</option>
-            {wards.map((ward) => (
-              <option key={ward.id} value={ward.id}>
-                {ward.name}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            name="ward_id"
+            control={control}
+            render={({ field: { onChange, value, onBlur, name, ref } }) => (
+              <Select
+                label="Phường / Xã"
+                name={name}
+                ref={ref}
+                value={value || ''}
+                onChange={(e) => {
+                  const selectedValue = e.target.value
+                  console.log('🟡 Ward onChange triggered:', selectedValue, 'Event:', e)
+                  onChange(e) // Pass the event directly to Controller
+                }}
+                onBlur={onBlur}
+                error={errors.ward_id?.message}
+                disabled={disabled || !districtId || loadingWards}
+                required
+                placeholder="Chọn Phường/Xã"
+                options={wards.map((ward) => ({
+                  value: ward.id,
+                  label: ward.name
+                }))}
+              />
+            )}
+          />
           {loadingWards && (
             <div className="mt-2 flex items-center gap-2 text-sm text-text-sub">
               <Spinner size="sm" />

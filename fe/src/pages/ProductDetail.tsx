@@ -17,6 +17,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { ROUTES } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
 import type { Product } from '@/types'
+import type { AddToCartRequest } from '@/types/cart.types'
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -122,18 +123,46 @@ const ProductDetail = () => {
     setIsAddingToCart(true)
 
     try {
-      await addToCart({
-        product_id: product._id,
-        buy_count: quantity,
-        size: selectedSize || undefined,
-        color: selectedColor || undefined,
-      })
+      // Ensure product_id is a string and buy_count is an integer
+      const cartData: AddToCartRequest = {
+        product_id: String(product._id),
+        buy_count: Math.floor(quantity), // Ensure integer
+      }
+      
+      // Only include size/color if they have values (not empty strings)
+      if (selectedSize && selectedSize.trim()) {
+        cartData.size = selectedSize.trim()
+      }
+      if (selectedColor && selectedColor.trim()) {
+        cartData.color = selectedColor.trim()
+      }
+      
+      console.log('Adding to cart with data:', cartData)
+      console.log('Product _id:', product._id, 'Type:', typeof product._id)
+      
+      await addToCart(cartData)
       // Success - cart context will update automatically
       showSuccess('Sản phẩm đã được thêm vào giỏ hàng!')
       setAddToCartError(null)
     } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || 'Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.'
+      console.error('Add to cart error:', err)
+      console.error('Error response:', err.response?.data)
+      
+      // Extract validation errors if available
+      let errorMessage = 'Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.'
+      if (err.response?.data) {
+        if (err.response.data.errors) {
+          // Format validation errors
+          const errorFields = Object.keys(err.response.data.errors)
+          const errorMessages = errorFields.map(
+            (field) => `${field}: ${err.response.data.errors[field][0]}`
+          )
+          errorMessage = `Lỗi validation: ${errorMessages.join(', ')}`
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message
+        }
+      }
+      
       setAddToCartError(errorMessage)
       showError(errorMessage)
     } finally {

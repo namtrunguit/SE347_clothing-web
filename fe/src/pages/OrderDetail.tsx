@@ -9,7 +9,7 @@ import Skeleton from '@/components/common/Skeleton'
 import * as ordersService from '@/services/orders.service'
 import { ROUTES } from '@/utils/constants'
 import { formatPrice } from '@/utils/formatters'
-import type { Order, OrderStatus } from '@/types'
+import { OrderStatus, type Order } from '@/types'
 
 const getStatusBadgeClass = (status: OrderStatus) => {
   switch (status) {

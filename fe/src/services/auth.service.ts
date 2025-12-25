@@ -97,6 +97,55 @@ export const logout = async (): Promise<void> => {
 }
 
 /**
+ * Refresh access token bằng refresh token
+ * Sử dụng axios instance riêng để tránh trigger interceptor
+ */
+export const refreshToken = async (): Promise<LoginResponse> => {
+  const { getRefreshToken, setTokens } = await import('@/utils/storage')
+  const refresh_token = getRefreshToken()
+  
+  if (!refresh_token) {
+    throw new Error('Refresh token not found')
+  }
+
+  // Tạo axios instance riêng để tránh trigger interceptor
+  const axiosInstance = (await import('axios')).default.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
+    timeout: 30000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const response = await axiosInstance.post<ApiResponse<any>>(
+    API_ENDPOINTS.AUTH.REFRESH_TOKEN,
+    { refresh_token }
+  )
+  
+  const { access_token, refresh_token: new_refresh_token, user: backendUser } = response.data.data
+
+  // Map user data từ backend response
+  const user: LoginResponse['user'] = {
+    _id: backendUser.id || backendUser._id || '',
+    first_name: backendUser.first_name || backendUser.name?.split(' ')[0] || '',
+    last_name: backendUser.last_name || backendUser.name?.split(' ').slice(1).join(' ') || '',
+    full_name: backendUser.full_name || backendUser.name || '',
+    email: backendUser.email,
+    role: backendUser.role || 'customer',
+    avatar: backendUser.avatar || backendUser.avatar_url,
+    address: backendUser.address,
+    phonenumber: backendUser.phonenumber,
+    createdAt: backendUser.createdAt,
+    updatedAt: backendUser.updatedAt,
+  }
+
+  // Lưu tokens mới vào localStorage
+  setTokens(access_token, new_refresh_token)
+
+  return { access_token, refresh_token: new_refresh_token, user }
+}
+
+/**
  * Đăng nhập bằng social (Google/Facebook)
  */
 export const socialLogin = async (
@@ -141,8 +190,32 @@ export const forgotPassword = async (
 /**
  * Đặt lại mật khẩu
  */
-export const resetPassword = async (data: ResetPasswordRequest): Promise<void> => {
-  await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data)
+export const resetPassword = async (data: ResetPasswordRequest): Promise<LoginResponse> => {
+  const response = await api.post<ApiResponse<any>>(
+    API_ENDPOINTS.AUTH.RESET_PASSWORD,
+    data
+  )
+  const { access_token, refresh_token, user: backendUser } = response.data.data
+
+  // Map user data từ backend response
+  const user: LoginResponse['user'] = {
+    _id: backendUser.id || backendUser._id || '',
+    first_name: backendUser.first_name || backendUser.name?.split(' ')[0] || '',
+    last_name: backendUser.last_name || backendUser.name?.split(' ').slice(1).join(' ') || '',
+    full_name: backendUser.full_name || backendUser.name || '',
+    email: backendUser.email,
+    role: backendUser.role || 'customer',
+    avatar: backendUser.avatar || backendUser.avatar_url,
+    address: backendUser.address,
+    phonenumber: backendUser.phonenumber,
+    createdAt: backendUser.createdAt,
+    updatedAt: backendUser.updatedAt,
+  }
+
+  // Lưu tokens vào localStorage
+  setTokens(access_token, refresh_token)
+
+  return { access_token, refresh_token, user }
 }
 
 /**

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
+import AdminLayout from '@/components/admin/AdminLayout'
 import StatsCard from '@/components/admin/StatsCard'
 import Chart from '@/components/admin/Chart'
 import Skeleton from '@/components/common/Skeleton'
@@ -44,10 +43,8 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-7xl">
+    <AdminLayout>
+      <div className="max-w-[1600px] mx-auto w-full">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-text-main dark:text-white mb-2">
@@ -167,9 +164,7 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </AdminLayout>
   )
 }
 

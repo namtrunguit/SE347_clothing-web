@@ -4,6 +4,7 @@ import { login as loginService, register as registerService, logout as logoutSer
 import { getToken, clearTokens } from '@/utils/storage'
 import type { User, LoginRequest, RegisterRequest, LoginResponse, RegisterResponse } from '@/types'
 import { ROUTES } from '@/utils/constants'
+import { useTokenRefresh } from '@/hooks/useTokenRefresh'
 
 interface AuthContextType {
   user: User | null
@@ -25,6 +26,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
+
+  // Tự động refresh token trước khi hết hạn
+  useTokenRefresh()
 
   // Check authentication status on mount
   useEffect(() => {

@@ -1,5 +1,4 @@
 import databaseServices from './database.services'
-import { sendEmail } from './email.services'
 
 export interface ContactPayload {
   name: string
@@ -11,39 +10,38 @@ export interface ContactPayload {
 
 class ContactService {
   async submit(payload: ContactPayload) {
-    const doc = {
-      name: payload.name,
-      email: payload.email,
-      phone: payload.phone || '',
-      subject: payload.subject || 'Liên hệ từ khách hàng',
-      message: payload.message,
-      status: 'new',
-      created_at: new Date()
-    }
-    await databaseServices.contacts.insertOne(doc)
-
-    const notifyTo = process.env.CONTACT_NOTIFY_EMAIL
-    if (notifyTo) {
-      const html = `
-        <h3>YORI - Thông điệp liên hệ mới</h3>
-        <p><b>Tên:</b> ${this.escape(doc.name)}</p>
-        <p><b>Email:</b> ${this.escape(doc.email)}</p>
-        <p><b>Điện thoại:</b> ${this.escape(doc.phone)}</p>
-        <p><b>Chủ đề:</b> ${this.escape(doc.subject)}</p>
-        <p><b>Nội dung:</b></p>
-        <div>${this.escape(doc.message).replace(/\n/g, '<br/>')}</div>
-        <hr/>
-        <small>Thời gian: ${doc.created_at.toLocaleString('vi-VN')}</small>
-      `
-      try {
-        await sendEmail(notifyTo, doc.subject, html)
-      } catch (e) {
-        // ignore email errors, submission already saved
-        console.error('Contact email failed:', e)
+    try {
+      console.log('[ContactService] Submitting contact:', { name: payload.name, email: payload.email })
+      
+      const doc = {
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone || '',
+        subject: payload.subject || 'Liên hệ từ khách hàng',
+        message: payload.message,
+        status: 'new',
+        created_at: new Date()
       }
-    }
+      
+      console.log('[ContactService] Inserting to database...')
+      // Lưu vào DB
+      const result = await databaseServices.contacts.insertOne(doc)
+      console.log('[ContactService] Insert successful:', result.insertedId)
 
-    return { message: 'Gửi liên hệ thành công' }
+      // Trả về response ngay
+      return {
+        message: 'Gửi liên hệ thành công',
+        data: {
+          id: result.insertedId?.toString() || '',
+          name: doc.name,
+          email: doc.email,
+          created_at: doc.created_at.toISOString()
+        }
+      }
+    } catch (error) {
+      console.error('[ContactService] Error submitting contact:', error)
+      throw error
+    }
   }
 
   private escape(str: string) {

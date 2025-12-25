@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import Header from '@/components/common/Header'
-import Footer from '@/components/common/Footer'
-import Breadcrumb from '@/components/common/Breadcrumb'
+import AdminLayout from '@/components/admin/AdminLayout'
 import DataTable, { Column } from '@/components/admin/DataTable'
 import Button from '@/components/common/Button'
 import Input from '@/components/common/Input'
@@ -178,22 +176,12 @@ const AdminProducts = () => {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <Header />
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <Breadcrumb
-            items={[
-              { label: 'Trang chủ', to: ROUTES.HOME },
-              { label: 'Admin', to: ROUTES.ADMIN_DASHBOARD },
-              { label: 'Sản phẩm', to: ROUTES.ADMIN_PRODUCTS },
-            ]}
-          />
-
-          <div className="mt-8">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-text-main dark:text-white">Quản lý sản phẩm</h1>
-              <Button
+    <AdminLayout>
+      <div className="max-w-[1600px] mx-auto w-full">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-text-main dark:text-white mb-4">Quản lý sản phẩm</h1>
+          <div className="flex items-center justify-between mb-6">
+            <Button
                 onClick={() => {
                   // TODO: Navigate to add product page
                   showInfo('Chức năng thêm sản phẩm sẽ được implement sau')
@@ -271,10 +259,8 @@ const AdminProducts = () => {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
 
-      {/* Delete Confirmation Modal */}
+        {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -307,7 +293,7 @@ const AdminProducts = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </AdminLayout>
   )
 }
 
