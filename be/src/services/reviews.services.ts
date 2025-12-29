@@ -109,7 +109,17 @@ class ReviewsService {
    * Lấy reviews của một sản phẩm
    */
   async getProductReviews(product_id: string, page: number = 1, limit: number = 10, sort_by: 'newest' | 'helpful' | 'rating' = 'newest') {
-    const productId = new ObjectId(product_id)
+    // Validate product_id
+    if (!product_id) {
+      throw new Error('Product ID is required')
+    }
+
+    let productId: ObjectId
+    try {
+      productId = new ObjectId(product_id)
+    } catch (error) {
+      throw new Error('Invalid product ID format')
+    }
     const skip = (page - 1) * limit
 
     // Build sort
