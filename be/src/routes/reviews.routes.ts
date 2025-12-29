@@ -22,7 +22,10 @@ const reviewsRouter = Router()
  * Method: GET
  * Query: { page?, limit?, sort_by? }
  */
-reviewsRouter.get('/products/:product_id/reviews', wrapRequestHandler(getProductReviewsController))
+reviewsRouter.get('/products/:product_id/reviews', (req, res, next) => {
+  console.log('Reviews route hit:', req.path, req.params)
+  next()
+}, wrapRequestHandler(getProductReviewsController))
 
 /**
  * Description: Create review

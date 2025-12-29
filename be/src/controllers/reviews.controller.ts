@@ -97,6 +97,13 @@ export const getProductReviewsController = async (req: Request, res: Response) =
   const { page, limit, sort_by } = req.query
 
   try {
+    // Validate product_id
+    if (!product_id) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        message: 'Product ID is required'
+      })
+    }
+
     const result = await reviewsServices.getProductReviews(
       product_id,
       Number(page) || 1,
@@ -109,6 +116,7 @@ export const getProductReviewsController = async (req: Request, res: Response) =
       data: result
     })
   } catch (error: any) {
+    console.error('Error in getProductReviewsController:', error)
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       message: error.message || 'Failed to get reviews'
     })
